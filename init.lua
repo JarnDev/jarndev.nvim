@@ -879,6 +879,11 @@ require('lazy').setup({
         return '%2l:%-2v'
       end
 
+      -- Add bufferline for better open files navigation
+      require('mini.tabline').setup()
+
+      vim.keymap.set('n', '<S-Tab>', ':bprevious<CR>', { desc = 'Go to previous buffer' })
+      vim.keymap.set('n', '<Tab>', ':bnext<CR>', { desc = 'Go to next buffer' })
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
     end,
