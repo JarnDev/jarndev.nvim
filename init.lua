@@ -822,6 +822,13 @@ require('lazy').setup({
           { name = 'path' },
         },
       }
+
+      -- dadbod sql completions
+      cmp.setup.filetype({ 'sql' }, {
+        sources = {
+          { name = 'vim-dadbod-completion' },
+        },
+      })
     end,
   },
 
