@@ -204,6 +204,13 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+vim.api.nvim_create_autocmd('FileType', {
+  group = vim.api.nvim_create_augroup('FixSQLCommentString', { clear = true }),
+  callback = function(ev)
+    vim.bo[ev.buf].commentstring = '-- %s'
+  end,
+  pattern = { 'sql' },
+})
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
