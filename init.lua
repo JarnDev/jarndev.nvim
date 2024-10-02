@@ -900,6 +900,29 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader><Tab>l', ':bnext<CR>', { desc = 'Go to next buffer' })
       vim.keymap.set('n', '<leader><Tab>d', ':bdelete<CR>', { desc = 'Delete current buffer' })
       vim.keymap.set('n', '<leader><Tab>D', ':bdelete!<CR>', { desc = 'Delete current buffer forcefully' })
+
+      require('mini.move').setup {
+        -- Module mappings. Use `''` (empty string) to disable one.
+        mappings = {
+          -- Move visual selection in Visual mode. Defaults are Alt (Meta) + hjkl.
+          left = '<M-D-h>',
+          right = '<M-D-l>',
+          down = '<M-D-j>',
+          up = '<M-D-k>',
+
+          -- Move current line in Normal mode
+          line_left = '<M-D-h>',
+          line_right = '<M-D-l>',
+          line_down = '<M-D-j>',
+          line_up = '<M-D-k>',
+        },
+
+        -- Options which control moving behavior
+        options = {
+          -- Automatically reindent selection during linewise vertical move
+          reindent_linewise = true,
+        },
+      }
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
     end,
