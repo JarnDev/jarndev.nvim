@@ -23,15 +23,35 @@ return {
           [[ ▒ ░▒░    ▒   ▒▒ ░  ░▒ ░ ▒░░ ░░   ░ ▒░ ░ ▒  ▒  ░ ░  ░  ░ ░░  ]],
           [[ ░ ░ ░    ░   ▒     ░░   ░    ░   ░ ░  ░ ░  ░    ░       ░░  ]],
           [[ ░   ░        ░  ░   ░              ░    ░       ░  ░     ░  ]],
-          [[                                       ░                 ░  ]],
+          [[                                       ░                 ░   ]],
+          [[                                                             ]],
+          [[                                                             ]],
         },
-        -- Default shortcuts for the 'hyper' theme
+
         shortcut = {
-          { desc = '  Find file', group = '@file', action = 'Telescope find_files', key = 'f' },
-          { desc = '  Recent files', group = 'DiagnosticHint', action = 'Telescope oldfiles', key = 'r' },
-          { desc = '  Open config', group = 'Number', action = 'edit ~/.config/nvim/init.lua', key = 'c' },
-          { desc = '  Find word', group = 'DiagnosticWarn', action = 'Telescope live_grep', key = 'w' },
-          { desc = '  Lazy', group = 'DiagnosticInfo', action = 'Lazy', key = 'l' },
+          { icon = ' ', desc = 'Find file', group = '@file', action = 'Telescope find_files', key = 'f' },
+          { icon = ' ', desc = 'Recent files', group = 'DiagnosticHint', action = 'Telescope oldfiles', key = 'r' },
+          {
+            icon = ' ',
+            desc = 'Open config',
+            group = 'Number',
+            action = function()
+              local builtin = require 'telescope.builtin'
+              builtin.find_files { cwd = vim.fn.stdpath 'config' }
+            end,
+            key = 'c',
+          },
+          { icon = ' ', desc = 'Find word', group = 'DiagnosticWarn', action = 'Telescope live_grep', key = 'w' },
+          { icon = '󰒲 ', desc = 'Lazy', group = 'DiagnosticInfo', action = 'Lazy', key = 'l' },
+          {
+            icon = ' ',
+            desc = 'Quit',
+            group = 'Number',
+            action = function()
+              vim.api.nvim_input '<cmd>qa<cr>'
+            end,
+            key = 'q',
+          },
         },
       },
     }
