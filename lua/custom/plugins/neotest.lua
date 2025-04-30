@@ -1,0 +1,81 @@
+return {}
+--   'nvim-neotest/neotest',
+--   dependencies = {
+--     'nvim-lua/plenary.nvim',
+--     'nvim-treesitter/nvim-treesitter',
+--     'nvim-neotest/neotest-plenary',
+--     'nvim-neotest/neotest-jest',
+--     'nvim-neotest/nvim-nio',
+--     'nvim-lua/plenary.nvim',
+--     'antoinemadec/FixCursorHold.nvim',
+--   },
+--   keys = {
+--     '<Space>tt',
+--     '<Space>to',
+--     '<Space>ts',
+--     '<Space>tf',
+--     '<Space>td',
+--   },
+--   config = function()
+--     local neotest = require 'neotest'
+--     neotest.setup {
+--       icons = {
+--         failed = '',
+--         passed = '',
+--         running = '',
+--         skipped = '○',
+--         unknown = '',
+--       },
+--       output = {
+--         open_on_run = false,
+--       },
+--       adapters = {
+--         require 'neotest-plenary',
+--         require 'neotest-jest' {
+--           jestCommand = 'yarn test --',
+--         },
+--       },
+--     }
+--
+--     vim.keymap.set('n', '<Space>tt', function()
+--       vim.notify_once('Running single test', vim.log.levels.INFO, {
+--         title = 'Neotest',
+--       })
+--       neotest.run.run()
+--     end)
+--     vim.keymap.set('n', '<Space>to', function()
+--       neotest.output.open {
+--         enter = true,
+--         open_win = function(settings)
+--           local height = math.min(settings.height, vim.o.lines - 2)
+--           local width = math.min(settings.width, vim.o.columns - 2)
+--           return vim.api.nvim_open_win(0, true, {
+--             relative = 'editor',
+--             row = 7,
+--             col = (vim.o.columns - width) / 2,
+--             width = width,
+--             height = height,
+--             style = 'minimal',
+--             border = vim.g.floating_window_border,
+--             noautocmd = true,
+--           })
+--         end,
+--       }
+--     end)
+--     vim.keymap.set('n', '<Space>ts', function()
+--       neotest.summary.toggle()
+--     end)
+--     vim.keymap.set('n', '<Space>tf', function()
+--       vim.notify_once('Running tests', vim.log.levels.INFO, {
+--         title = 'Neotest',
+--       })
+--       neotest.run.run(vim.fn.expand '%')
+--     end)
+--     vim.keymap.set('n', '<Space>td', function()
+--       vim.notify_once('Start debugging test', vim.log.levels.INFO, {
+--         title = 'Neotest',
+--       })
+--       neotest.run.run { strategy = 'dap' }
+--     end)
+--   end,
+-- }
