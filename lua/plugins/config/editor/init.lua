@@ -7,4 +7,5 @@ return {
   { import = 'plugins.config.editor.lint' },
   { import = 'plugins.config.editor.indent_line' },
   { import = 'plugins.config.editor.telescope' },
+  { import = 'plugins.config.editor.hover' },
 } 
