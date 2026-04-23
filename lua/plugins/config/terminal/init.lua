@@ -1,3 +1,3 @@
 return {
-  { import = 'plugins.config.terminal.toggleterm' },
+  -- Terminal management handled by snacks.nvim (lua/plugins/config/ui/snacks.lua)
 } 

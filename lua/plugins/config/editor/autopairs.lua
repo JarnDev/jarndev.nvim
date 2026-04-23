@@ -8,7 +8,7 @@ return {
       javascript = { 'template_string' },
       java = false,
     },
-    disable_filetype = { 'TelescopePrompt', 'spectre_panel' },
+    disable_filetype = { 'snacks_picker_input', 'spectre_panel' },
     fast_wrap = {
       map = '<M-e>',
       chars = { '{', '[', '(', '"', "'" },

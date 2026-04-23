@@ -17,6 +17,23 @@ map('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
 -- Window navigation
 map('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+
+-- Kitty KKP delivers <BS> as both a press and a release event; suppress the duplicate.
+-- The two events arrive ~50-100 ms apart. Any <BS> within 200 ms of the previous one
+-- is the release event — swallow it. Non-BS keys reset the tracker.
+local _bs_ns = 0
+vim.on_key(function(key)
+  if key ~= '\x80\x6b\x62' then
+    _bs_ns = 0
+    return
+  end
+  local now = vim.uv.hrtime()
+  if _bs_ns > 0 and now - _bs_ns < 200000000 then
+    _bs_ns = 0
+    return ''
+  end
+  _bs_ns = now
+end)
 map('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 map('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 map('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })

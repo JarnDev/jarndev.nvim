@@ -5,7 +5,8 @@ return {
   { import = 'plugins.config.editor.markdown' },
   { import = 'plugins.config.editor.debug' },
   { import = 'plugins.config.editor.lint' },
-  { import = 'plugins.config.editor.indent_line' },
-  { import = 'plugins.config.editor.telescope' },
   { import = 'plugins.config.editor.hover' },
+  { import = 'plugins.config.editor.oil' },
+  { import = 'plugins.config.editor.grug-far' },
+  { import = 'plugins.config.editor.kulala' },
 } 

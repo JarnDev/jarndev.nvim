@@ -4,12 +4,8 @@ return {
     require('mini.ai').setup { n_lines = 500 }
     require('mini.surround').setup()
     
-    local statusline = require 'mini.statusline'
-    statusline.setup { use_icons = vim.g.have_nerd_font }
-    statusline.section_location = function()
-      return '%2l:%-2v'
-    end
-
+    -- mini.statusline disabled: lualine.nvim is used instead
+    -- mini.tabline kept for buffer navigation
     require('mini.tabline').setup()
     vim.keymap.set('n', '<leader><Tab>h', ':bprevious<CR>', { desc = 'Go to previous buffer' })
     vim.keymap.set('n', '<leader><Tab>l', ':bnext<CR>', { desc = 'Go to next buffer' })

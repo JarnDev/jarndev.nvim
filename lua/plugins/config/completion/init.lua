@@ -1,3 +1,3 @@
 return {
-  { import = 'plugins.config.completion.nvim-cmp' },
+  { import = 'plugins.config.completion.blink' },
 } 
