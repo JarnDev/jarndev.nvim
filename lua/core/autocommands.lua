@@ -1,3 +1,15 @@
+-- Neovim 0.12.2 bug: injection query processing passes nil nodes to get_range.
+-- Guard against it so the constant error notifications stop.
+do
+  local orig = vim.treesitter.get_range
+  vim.treesitter.get_range = function(node, source, metadata)
+    if node == nil then
+      return { 0, 0, 0, 0, 0, 0 }
+    end
+    return orig(node, source, metadata)
+  end
+end
+
 -- Highlight when yanking (copying) text
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',

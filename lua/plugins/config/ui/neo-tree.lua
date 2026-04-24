@@ -18,7 +18,7 @@ return {
     {
       '<leader>E',
       function()
-        require('neo-tree.command').execute({ source = 'filesystem', toggle = true, dir = vim.loop.cwd() })
+        require('neo-tree.command').execute({ source = 'filesystem', toggle = true, dir = vim.uv.cwd() })
       end,
       desc = 'Explorer NeoTree (cwd)',
     },
@@ -27,6 +27,7 @@ return {
     sources = { 'filesystem', 'buffers', 'git_status', 'document_symbols' },
     open_files_do_not_replace_types = { 'terminal', 'Trouble', 'trouble', 'qf', 'Outline' },
     filesystem = {
+      use_libuv_file_watcher = false,
       filtered_items = {
         visible = false,
         hide_dotfiles = false,

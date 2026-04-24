@@ -4,6 +4,7 @@ return {
   lazy = false,
   opts = {
     bigfile = { enabled = true },
+    image = { enabled = true },
     dashboard = {
       enabled = true,
       preset = {
@@ -39,7 +40,12 @@ return {
     lazygit = { enabled = true },
     notifier = { enabled = true },
     picker = { enabled = true },
-    scroll = { enabled = true },
+    scroll = {
+      enabled = true,
+      filter = function(buf)
+        return vim.bo[buf].filetype ~= 'neo-tree'
+      end,
+    },
     terminal = { enabled = true },
     words = { enabled = true },
   },
