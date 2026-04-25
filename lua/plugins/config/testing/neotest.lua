@@ -8,6 +8,7 @@ return {
     'nvim-neotest/neotest-vim-test',
     'nvim-neotest/neotest-go',
     'nvim-neotest/nvim-nio',
+    'haydenmeade/neotest-jest',
   },
   config = function()
     require('neotest').setup({
@@ -15,6 +16,19 @@ return {
         require('neotest-python'),
         require('neotest-vim-test'),
         require('neotest-go'),
+        require('neotest-jest')({
+          jestCommand = 'npx jest',
+          jestConfigFile = function(file)
+            if string.find(file, '/packages/') then
+              return string.match(file, '(.-/[^/]+/)src') .. 'jest.config.ts'
+            end
+            return vim.fn.getcwd() .. '/jest.config.ts'
+          end,
+          env = { CI = true },
+          cwd = function()
+            return vim.fn.getcwd()
+          end,
+        }),
       },
       status = { virtual_text = true },
       output = { open_on_run = true },

@@ -17,8 +17,8 @@ return {
       handlers = {},
       ensure_installed = {
         'python',
-        'node2',
         'delve',
+        'js-debug-adapter',
       },
     })
 
@@ -52,25 +52,54 @@ return {
       },
     }
 
-    -- Node.js configuration
-    dap.adapters.node2 = {
-      type = 'executable',
-      command = 'node',
-      args = { os.getenv('HOME') .. '/.local/share/nvim/mason/packages/node-debug2-adapter/out/src/nodeDebug.js' },
-    }
+    -- JS/TS configuration (js-debug-adapter)
+    local js_debug = os.getenv('HOME') .. '/.local/share/jarndev.nvim/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js'
+    for _, adapter in ipairs({ 'node', 'pwa-node', 'pwa-chrome' }) do
+      dap.adapters[adapter] = {
+        type = 'server',
+        host = 'localhost',
+        port = '${port}',
+        executable = {
+          command = 'node',
+          args = { js_debug, '${port}' },
+        },
+      }
+    end
 
-    dap.configurations.javascript = {
+    local js_configs = {
       {
-        type = 'node2',
+        type = 'pwa-node',
         request = 'launch',
         name = 'Launch file',
         program = '${file}',
-        cwd = vim.fn.getcwd(),
+        cwd = '${workspaceFolder}',
         sourceMaps = true,
-        protocol = 'auto',
-        console = 'integratedTerminal',
+      },
+      {
+        -- Run `npm run start:debug` in a terminal first, then use this.
+        type = 'pwa-node',
+        request = 'attach',
+        name = 'Attach to NestJS (port 9229)',
+        port = 9229,
+        cwd = '${workspaceFolder}',
+        sourceMaps = true,
+        resolveSourceMapLocations = { '${workspaceFolder}/src/**', '!**/node_modules/**' },
+        skipFiles = { '<node_internals>/**', 'node_modules/**' },
+        restart = true, -- auto-reattach when watch mode restarts the process
+      },
+      {
+        type = 'pwa-node',
+        request = 'attach',
+        name = 'Attach to process',
+        processId = require('dap.utils').pick_process,
+        cwd = '${workspaceFolder}',
+        sourceMaps = true,
       },
     }
+
+    for _, lang in ipairs({ 'javascript', 'typescript', 'javascriptreact', 'typescriptreact' }) do
+      dap.configurations[lang] = js_configs
+    end
 
     -- Go configuration
     dap.adapters.delve = {
