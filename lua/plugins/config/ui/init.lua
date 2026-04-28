@@ -8,4 +8,5 @@ return {
   { import = 'plugins.config.ui.snacks' },
   { import = 'plugins.config.ui.trouble' },
   { import = 'plugins.config.ui.lualine' },
+  { import = 'plugins.config.ui.bufferline' },
 } 

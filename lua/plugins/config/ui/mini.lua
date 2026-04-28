@@ -5,12 +5,7 @@ return {
     require('mini.surround').setup()
     
     -- mini.statusline disabled: lualine.nvim is used instead
-    -- mini.tabline kept for buffer navigation
-    require('mini.tabline').setup()
-    vim.keymap.set('n', '<leader><Tab>h', ':bprevious<CR>', { desc = 'Go to previous buffer' })
-    vim.keymap.set('n', '<leader><Tab>l', ':bnext<CR>', { desc = 'Go to next buffer' })
-    vim.keymap.set('n', '<leader><Tab>d', ':bdelete<CR>', { desc = 'Delete current buffer' })
-    vim.keymap.set('n', '<leader><Tab>D', ':bdelete!<CR>', { desc = 'Delete current buffer forcefully' })
+    -- mini.tabline disabled: bufferline.nvim is used instead
 
     require('mini.move').setup {
       mappings = {
