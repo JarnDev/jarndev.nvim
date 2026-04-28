@@ -31,10 +31,6 @@ return {
     },
   },
   keys = {
-    { '<leader><Tab>h', '<cmd>BufferLineCyclePrev<cr>', desc = 'Previous buffer' },
-    { '<leader><Tab>l', '<cmd>BufferLineCycleNext<cr>', desc = 'Next buffer' },
-    { '<leader><Tab>d', '<cmd>bdelete<cr>', desc = 'Delete buffer' },
-    { '<leader><Tab>D', '<cmd>bdelete!<cr>', desc = 'Delete buffer (force)' },
     { '<leader><Tab>p', '<cmd>BufferLinePick<cr>', desc = 'Pick buffer' },
     { '<leader><Tab>P', '<cmd>BufferLineTogglePin<cr>', desc = 'Pin/unpin buffer' },
   },
