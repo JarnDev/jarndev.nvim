@@ -1,12 +1,16 @@
--- Neovim 0.12.2 bug: injection query processing passes nil nodes to get_range.
--- Guard against it so the constant error notifications stop.
+-- Neovim 0.12.2 bug: injection/scope processing passes nil or stale TSNodes.
+-- Guard: nil node, or userdata node whose :range() method has been GC'd.
 do
   local orig = vim.treesitter.get_range
   vim.treesitter.get_range = function(node, source, metadata)
     if node == nil then
       return { 0, 0, 0, 0, 0, 0 }
     end
-    return orig(node, source, metadata)
+    if type(node) ~= 'table' and type(node.range) ~= 'function' then
+      return { 0, 0, 0, 0, 0, 0 }
+    end
+    local ok, result = pcall(orig, node, source, metadata)
+    return ok and result or { 0, 0, 0, 0, 0, 0 }
   end
 end
 

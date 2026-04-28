@@ -1,19 +1,23 @@
 return {
-  'preservim/vim-markdown',
-  ft = 'markdown',
-  init = function()
-    vim.g.vim_markdown_folding_disabled = 1
-    vim.g.vim_markdown_frontmatter = 1
-    vim.g.vim_markdown_conceal = 0
-    vim.g.vim_markdown_fenced_languages = {
-      'ts=typescript',
-      'js=javascript',
-      'json=json',
-      'html=html',
-      'css=css',
-      'python=python',
-      'bash=sh',
-      'shell=sh',
-    }
-  end,
-} 
+  'MeanderingProgrammer/render-markdown.nvim',
+  dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
+  ft = { 'markdown', 'Avante' },
+  opts = {
+    heading = {
+      sign = false,
+      icons = { '󰲡 ', '󰲣 ', '󰲥 ', '󰲧 ', '󰲩 ', '󰲫 ' },
+    },
+    code = {
+      sign = false,
+      width = 'block',
+      right_pad = 1,
+    },
+    bullet = {
+      icons = { '●', '○', '◆', '◇' },
+    },
+    checkbox = {
+      unchecked = { icon = '󰄱 ' },
+      checked = { icon = '󰱒 ' },
+    },
+  },
+}
