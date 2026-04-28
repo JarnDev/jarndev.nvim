@@ -17,6 +17,12 @@ return {
       'vimdoc',
       'javascript',
       'typescript',
+      'tsx',
+      'go',
+      'python',
+      'yaml',
+      'toml',
+      'json',
     },
     auto_install = true,
     highlight = {

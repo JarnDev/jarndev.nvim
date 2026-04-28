@@ -1,4 +1,3 @@
--- Basic Neovim options
 local opt = vim.opt
 
 -- Line numbers
@@ -8,11 +7,12 @@ opt.relativenumber = true
 -- Mouse support
 opt.mouse = 'a'
 
--- UI options
+-- UI
 opt.showmode = false
 opt.signcolumn = 'yes'
 opt.cursorline = true
 opt.scrolloff = 10
+opt.conceallevel = 2  -- needed for render-markdown.nvim
 
 -- Clipboard
 vim.schedule(function()
@@ -36,6 +36,16 @@ opt.timeoutlen = 300
 opt.splitright = true
 opt.splitbelow = true
 
--- Whitespace
+-- Whitespace display
 opt.list = true
 opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+
+-- Smooth scrolling (Neovim 0.10+)
+opt.smoothscroll = true
+
+-- Treesitter-based folding (folds open by default)
+opt.foldmethod = 'expr'
+opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+opt.foldlevel = 99
+opt.foldlevelstart = 99
+opt.fillchars = { fold = ' ', foldopen = '▾', foldclose = '▸', foldsep = ' ' }

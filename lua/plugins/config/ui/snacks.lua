@@ -36,6 +36,7 @@ return {
       sections = {
         { section = 'header' },
         { section = 'keys', gap = 1, padding = 1 },
+        { section = 'recent_files', limit = 5, padding = 1 },
         { section = 'projects', limit = 8, padding = 1 },
         { section = 'startup' },
       },
@@ -79,6 +80,8 @@ return {
     { '<leader>ws', function() Snacks.picker.lsp_workspace_symbols() end, desc = '[W]orkspace [S]ymbols' },
     -- Git
     { '<leader>gB', function() Snacks.gitbrowse() end, desc = '[G]it [B]rowse (open in browser)', mode = { 'n', 'v' } },
+    -- Dashboard
+    { '<leader>H', function() Snacks.dashboard.open() end, desc = '[H]ome dashboard' },
     -- Terminals
     { '<leader>lg', function() Snacks.lazygit() end, desc = '[L]azy[G]it' },
     { '<leader>ld', function() Snacks.terminal('lazydocker') end, desc = '[L]azy[D]ocker' },

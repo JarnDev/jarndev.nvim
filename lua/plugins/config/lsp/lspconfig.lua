@@ -25,7 +25,9 @@ return {
         map('<leader>D', function() Snacks.picker.lsp_type_definitions() end, 'Type [D]efinition')
         map('<leader>ds', function() Snacks.picker.lsp_document_symbols() end, '[D]ocument [S]ymbols')
         map('<leader>ws', function() Snacks.picker.lsp_workspace_symbols() end, '[W]orkspace [S]ymbols')
-        map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
+        vim.keymap.set('n', '<leader>cn', function()
+          return ':IncRename ' .. vim.fn.expand('<cword>')
+        end, { buffer = event.buf, expr = true, desc = 'LSP: [R]e[n]ame' })
         map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
         map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
@@ -77,6 +79,13 @@ return {
           },
         },
       },
+      ts_ls = {},
+      jsonls = {},
+      html = {},
+      cssls = {},
+      tailwindcss = {},
+      eslint = {},
+      pyright = {},
     }
 
     -- Mason setup
@@ -85,6 +94,9 @@ return {
     vim.list_extend(ensure_installed, {
       'stylua',
       'markdownlint-cli2',
+      'ruff',
+      'prettierd',
+      'eslint_d',
     })
     require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 

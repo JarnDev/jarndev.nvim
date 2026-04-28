@@ -5,7 +5,6 @@ return {
     'nvim-treesitter/nvim-treesitter',
     'antoinemadec/FixCursorHold.nvim',
     'nvim-neotest/neotest-python',
-    'nvim-neotest/neotest-vim-test',
     'nvim-neotest/neotest-go',
     'nvim-neotest/nvim-nio',
     'haydenmeade/neotest-jest',
@@ -14,7 +13,6 @@ return {
     require('neotest').setup({
       adapters = {
         require('neotest-python'),
-        require('neotest-vim-test'),
         require('neotest-go'),
         require('neotest-jest')({
           jestCommand = 'npx jest',
@@ -39,7 +37,6 @@ return {
       },
     })
 
-    -- Keymaps
     vim.keymap.set('n', '<leader>tt', function()
       require('neotest').run.run()
     end, { desc = 'Run nearest test' })
