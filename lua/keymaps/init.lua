@@ -55,6 +55,21 @@ vim.api.nvim_create_user_command('KKPDebug', function()
 end, {})
 
 map('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+
+-- Vim special keys reference drawer
+map('n', '<leader>?', function()
+  Snacks.win({
+    file = vim.fn.stdpath('config') .. '/doc/vim-keys.md',
+    width = 0.6,
+    height = 0.85,
+    border = 'rounded',
+    title = ' Vim Keys Reference ',
+    title_pos = 'center',
+    wo = { wrap = false, conceallevel = 2 },
+    keys = { q = 'close', ['<Esc>'] = 'close' },
+  })
+end, { desc = 'Vim keys reference' })
+
 map('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 map('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 

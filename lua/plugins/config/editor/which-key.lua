@@ -51,6 +51,7 @@ return {
       { '<leader>x', group = 'Diagnostics' },
       { '<leader>q', group = '[Q]uit / Sessions' },
       { '<leader><Tab>', group = 'Buffers' },
+      { '<leader>?', desc = 'Vim keys reference' },
     },
   },
 }
