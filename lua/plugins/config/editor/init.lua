@@ -9,4 +9,5 @@ return {
   { import = 'plugins.config.editor.oil' },
   { import = 'plugins.config.editor.grug-far' },
   { import = 'plugins.config.editor.kulala' },
+  { import = 'plugins.config.editor.sessions' },
 } 

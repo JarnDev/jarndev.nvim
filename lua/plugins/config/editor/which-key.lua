@@ -49,6 +49,7 @@ return {
       { '<leader>t', group = '[T]esting' },
       { '<leader>w', group = '[W]orkspace' },
       { '<leader>x', group = 'Diagnostics' },
+      { '<leader>q', group = '[Q]uit / Sessions' },
       { '<leader><Tab>', group = 'Buffers' },
     },
   },
