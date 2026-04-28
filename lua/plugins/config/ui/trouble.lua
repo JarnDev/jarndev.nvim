@@ -8,5 +8,7 @@ return {
     { '<leader>xq', '<cmd>Trouble qflist toggle<cr>', desc = 'Quickfix List' },
     { '<leader>xl', '<cmd>Trouble loclist toggle<cr>', desc = 'Location List' },
     { '<leader>xs', '<cmd>Trouble symbols toggle focus=false<cr>', desc = 'Symbols' },
+    { ']x', function() require('trouble').next({ skip_groups = true, jump = true }) end, desc = 'Next Trouble item' },
+    { '[x', function() require('trouble').prev({ skip_groups = true, jump = true }) end, desc = 'Previous Trouble item' },
   },
 }
