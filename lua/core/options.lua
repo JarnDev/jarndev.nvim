@@ -40,8 +40,7 @@ opt.splitbelow = true
 opt.list = true
 opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
--- Smooth scrolling (Neovim 0.10+)
-opt.smoothscroll = true
+-- Smooth scrolling handled by snacks.scroll (opt.smoothscroll would double up)
 
 -- Treesitter-based folding (folds open by default)
 opt.foldmethod = 'expr'
