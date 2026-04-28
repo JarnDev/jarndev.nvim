@@ -2,6 +2,7 @@ return {
   'folke/which-key.nvim',
   event = 'VimEnter',
   opts = {
+    preset = 'modern',
     icons = {
       mappings = vim.g.have_nerd_font,
       keys = vim.g.have_nerd_font and {} or {
@@ -38,15 +39,17 @@ return {
     spec = {
       { '<leader>a', group = '[A]I Assistant', mode = { 'n', 'v' } },
       { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
-      { '<leader>d', group = '[D]ocument' },
+      { '<leader>d', group = '[D]ebug' },
       { '<leader>g', group = '[G]it' },
       { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
-      { '<leader>l', group = '[L]azy utils', mode = { 'n', 'v' } },
-      { '<leader>r', group = '[R]ename' },
+      { '<leader>l', group = '[L]azy utils' },
+      { '<leader>r', group = 'HTTP [R]equests' },
       { '<leader>s', group = '[S]earch' },
-      { '<leader>t', group = '[T]oggle' },
+      { '<leader>S', group = '[S]earch & Replace' },
+      { '<leader>t', group = '[T]esting' },
       { '<leader>w', group = '[W]orkspace' },
       { '<leader>x', group = 'Diagnostics' },
+      { '<leader><Tab>', group = 'Buffers' },
     },
   },
-} 
+}
