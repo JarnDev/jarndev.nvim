@@ -32,7 +32,7 @@ require('plugins')    -- lazy.setup() with all plugin imports
 lua/
   bootstrap/          Leader key, Nerd Font flag, lazy.nvim install
   core/               options.lua, autocommands.lua
-  keymaps/            Global keymaps (window nav, KKP backspace fix, etc.)
+  keymaps/            Global keymaps (window nav, diagnostics, mpv, etc.)
   plugins/
     init.lua          lazy.setup() — imports all config categories
     config/
