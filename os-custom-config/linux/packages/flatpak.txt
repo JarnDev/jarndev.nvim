@@ -1,0 +1,2 @@
+io.gitlab.adhami3310.Footage
+net.lutris.Lutris

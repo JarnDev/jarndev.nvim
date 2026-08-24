@@ -1,0 +1,12 @@
+# Format: <name> [--classic]
+yazi --classic
+gitkraken --classic
+k9s --classic
+kustomize
+vlc
+spotify
+telegram-desktop
+dbeaver-ce
+notion-snap-reborn
+firefox
+thunderbird
