@@ -73,9 +73,23 @@ local function chafa_logo()
   if vim.v.shell_error ~= 0 then
     return ''
   end
-  out = out:gsub('\27%[[%d;?]*[A-Za-z]', ''):gsub('%s+$', '')
-  chafa_cache = out
-  return out
+  out = out:gsub('\27%[[%d;?]*[A-Za-z]', '')
+  -- The dashboard centers every header line on its own: pad all lines to the same
+  -- display width so short (trailing-space-trimmed) lines don't drift right.
+  local lines, width = {}, 0
+  for line in out:gmatch '[^\n]+' do
+    line = line:gsub('%s+$', '')
+    lines[#lines + 1] = line
+    width = math.max(width, vim.fn.strdisplaywidth(line))
+  end
+  while #lines > 0 and lines[#lines] == '' do
+    table.remove(lines)
+  end
+  for i, line in ipairs(lines) do
+    lines[i] = line .. (' '):rep(width - vim.fn.strdisplaywidth(line))
+  end
+  chafa_cache = table.concat(lines, '\n')
+  return chafa_cache
 end
 
 vim.api.nvim_create_autocmd('User', {
