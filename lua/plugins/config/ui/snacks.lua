@@ -1,6 +1,6 @@
 local LOGO = vim.fn.stdpath 'config' .. '/assets/logo.png'
-local LOGO_ROWS = 24 -- image height in terminal rows (800x576 px -> ~66 cols at 24 rows)
-local LOGO_COLS = 66
+local LOGO_ROWS = 20 -- image height in terminal rows (800x576 px -> ~56 cols at 20 rows)
+local LOGO_COLS = 56
 
 -- Terminals that can speak the kitty graphics protocol (same check as `image.enabled` below).
 -- Checked first so Snacks.image.supports_terminal() (a blocking terminal query) never runs
@@ -68,7 +68,7 @@ local function chafa_logo()
     '--work',
     '9',
     '--size',
-    '70x28',
+    '55x22',
   }
   if vim.v.shell_error ~= 0 then
     return ''
