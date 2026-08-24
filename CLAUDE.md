@@ -88,6 +88,7 @@ System binaries that must be installed separately:
 | Binary | Purpose | Install |
 |--------|---------|---------|
 | `mpv` | Video playback (`<leader>rv`) — launches detached in its own window | `sudo apt install mpv` |
+| `chafa` | Renders the dashboard logo (`assets/logo.png`) | `sudo apt install chafa` |
 | `ollama` | Local models for minuet / codecompanion (`<leader>at`, `<leader>aL`) | https://ollama.com |
 
 ## Useful In-Editor Commands

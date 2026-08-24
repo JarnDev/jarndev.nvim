@@ -34,12 +34,31 @@ return {
           { icon = ' ', key = 'q', desc = 'Quit', action = ':qa' },
         },
       },
+      -- Two panes: logo (chafa) on the left, ASCII header + lists on the right.
+      -- Snacks stacks the panes vertically when the window is narrower than 2*width+pane_gap.
+      width = 64,
+      pane_gap = 2,
       sections = {
-        { section = 'header' },
-        { section = 'keys', gap = 1, padding = 1 },
-        { section = 'recent_files', limit = 5, padding = 1 },
-        { section = 'projects', limit = 8, padding = 1 },
-        { section = 'startup' },
+        {
+          section = 'terminal',
+          cmd = ('chafa %s --format symbols --symbols vhalf --colors full --size 22x18; sleep .1'):format(
+            vim.fn.shellescape(vim.fn.stdpath 'config' .. '/assets/logo.png')
+          ),
+          height = 18,
+          indent = 20, -- center the 22-col logo inside the 64-col pane
+          padding = 1,
+          enabled = function()
+            return vim.fn.executable 'chafa' == 1
+          end,
+        },
+        {
+          pane = 2,
+          { section = 'header' },
+          { section = 'keys', gap = 1, padding = 1 },
+          { section = 'recent_files', limit = 5, padding = 1 },
+          { section = 'projects', limit = 8, padding = 1 },
+          { section = 'startup' },
+        },
       },
     },
     gitbrowse = { enabled = true },

@@ -5,4 +5,5 @@ nvim
 
 spell/
 lazy-lock.json
-assets/
+assets/*
+!assets/logo.png

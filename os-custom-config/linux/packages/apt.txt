@@ -10,6 +10,7 @@ atop
 ncdu
 pv
 tree-sitter-cli
+chafa
 inotify-tools
 locate
 xclip
