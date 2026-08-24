@@ -34,31 +34,31 @@ return {
           { icon = ' ', key = 'q', desc = 'Quit', action = ':qa' },
         },
       },
-      -- Two panes: logo (chafa) on the left, ASCII header + lists on the right.
-      -- Snacks stacks the panes vertically when the window is narrower than 2*width+pane_gap.
-      width = 64,
-      pane_gap = 2,
+      -- Single column: the full JarnDev logo (cat + wordmark) rendered by chafa as one
+      -- item, then the lists. Without chafa the section is skipped and the ASCII header shows.
+      width = 60,
       sections = {
         {
           section = 'terminal',
-          cmd = ('chafa %s --format symbols --symbols vhalf --colors full --size 12x9; sleep .1'):format(
+          cmd = ('chafa %s --format symbols --symbols vhalf --colors full --size 60x24; sleep .1'):format(
             vim.fn.shellescape(vim.fn.stdpath 'config' .. '/assets/logo.png')
           ),
-          height = 9, -- same height as the ASCII header
-          indent = 50, -- push the ~12-col logo to the right edge of the 64-col pane, next to the header
+          height = 24,
           padding = 1,
           enabled = function()
             return vim.fn.executable 'chafa' == 1
           end,
         },
         {
-          pane = 2,
-          { section = 'header' },
-          { section = 'keys', gap = 1, padding = 1 },
-          { section = 'recent_files', limit = 5, padding = 1 },
-          { section = 'projects', limit = 8, padding = 1 },
-          { section = 'startup' },
+          section = 'header',
+          enabled = function()
+            return vim.fn.executable 'chafa' ~= 1
+          end,
         },
+        { section = 'keys', gap = 1, padding = 1 },
+        { section = 'recent_files', limit = 5, padding = 1 },
+        { section = 'projects', limit = 8, padding = 1 },
+        { section = 'startup' },
       },
     },
     gitbrowse = { enabled = true },
