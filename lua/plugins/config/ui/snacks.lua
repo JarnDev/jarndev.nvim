@@ -40,7 +40,7 @@ return {
       sections = {
         {
           section = 'terminal',
-          cmd = ('chafa %s --format symbols --symbols block --colors 2 --fg-only --dither none --work 9 --size 70x28; sleep .1'):format(
+          cmd = ('chafa %s --format symbols --symbols block+space --colors 2 --fg-only --dither none --work 9 --size 70x28; sleep .1'):format(
             vim.fn.shellescape(vim.fn.stdpath 'config' .. '/assets/logo.png')
           ),
           height = 28,
