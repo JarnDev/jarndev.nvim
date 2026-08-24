@@ -63,7 +63,7 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 - **AI**: claudecode.nvim (CLI terminal integration) + codecompanion.nvim (Anthropic API chat/inline). copilot.vim stays for ghost-text completions.
 - **Hover**: hover.nvim (`K` = hover, `gK` = select provider). Configured in `lua/plugins/config/editor/hover.lua`.
 - **LSP servers**: configured with `vim.lsp.config()` in `lspconfig.lua`; mason-lspconfig v2 auto-enables installed servers (`automatic_enable.exclude` keeps stylua/ruff as tools only).
-- **KKP backspace fix**: `lua/keymaps/init.lua` contains a `vim.on_key` dedup for the Kitty Keyboard Protocol double-backspace bug.
+- **KKP backspace fix**: `lua/keymaps/init.lua` contains a `vim.on_key` dedup for the Kitty Keyboard Protocol double-backspace bug; active under kitty (`KITTY_WINDOW_ID`) and herdr (`HERDR_ENV`).
 
 ### Active Plugin Summary
 

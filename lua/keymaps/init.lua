@@ -23,10 +23,11 @@ map('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 -- Window navigation
 map('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
 
--- Kitty-only: KKP fires both press and release events for every special key.
+-- KKP (Kitty Keyboard Protocol) fires both press and release events for every special key.
 -- Neovim processes the release as a second keystroke, doubling it.
--- Guard on KITTY_WINDOW_ID so this never runs in other terminals.
-if vim.env.KITTY_WINDOW_ID then
+-- Runs in kitty directly (KITTY_WINDOW_ID) or inside herdr (HERDR_ENV), which forwards
+-- the host terminal's KKP into its panes without exporting kitty's env vars.
+if vim.env.KITTY_WINDOW_ID or vim.env.HERDR_ENV then
   local _kkp_last = {}
   vim.on_key(function(key)
     if #key == 0 then
