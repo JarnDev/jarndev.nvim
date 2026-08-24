@@ -1,0 +1,111 @@
+# Terminal & Shell
+zsh
+zsh-autosuggestions
+zsh-syntax-highlighting
+fish
+bat
+btop
+htop
+atop
+ncdu
+pv
+tree-sitter-cli
+inotify-tools
+locate
+xclip
+trash-cli
+neofetch
+inxi
+
+# Search & Navigation
+fd-find
+ripgrep
+fzf
+jq
+jqp
+
+# Network & Security
+curl
+wget
+nmap
+ncat
+tshark
+iftop
+trippy
+openssl
+clamav
+clamtk
+steghide
+
+# Dev Tools
+git
+gh
+neovim
+make
+gcc
+g++
+gdb
+build-essential
+cmake
+ninja-build
+pkg-config
+lua5.4
+liblua5.4-dev
+python3
+python3-pip
+python3-venv
+pipenv
+
+# Build deps (for compiling tools from source)
+libbz2-dev
+libffi-dev
+libssl-dev
+libreadline-dev
+libsqlite3-dev
+liblzma-dev
+zlib1g-dev
+libxml2-dev
+tk-dev
+
+# Docker
+containerd.io
+docker-buildx-plugin
+docker-ce
+docker-ce-cli
+docker-compose
+docker-compose-plugin
+
+# Database
+postgresql-client
+postgresql-client-common
+redis-tools
+pg-activity
+
+# Kubernetes / Infra
+minikube
+kubectx
+terraform
+
+# Media
+mpv
+ffmpegthumbnailer
+peek
+
+# Yazi deps
+unar
+poppler-utils
+
+# Fonts
+fonts-firacode
+
+# Productivity
+copyq
+taskwarrior
+timewarrior
+wkhtmltopdf
+obs-studio
+calibre
+
+# Misc
+unzip
+zip

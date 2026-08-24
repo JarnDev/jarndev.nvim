@@ -62,8 +62,8 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 - **Statusline**: lualine.nvim (mini.statusline is disabled in mini.lua).
 - **AI**: claudecode.nvim (CLI terminal integration) + codecompanion.nvim (Anthropic API chat/inline). copilot.vim stays for ghost-text completions.
 - **Hover**: hover.nvim (`K` = hover, `gK` = select provider). Configured in `lua/plugins/config/editor/hover.lua`.
+- **Terminal**: kitty from the upstream installer (`os-custom-config/linux/install-kitty.sh`); the Ubuntu apt kitty 0.32.2 doubles Backspace/Enter under KKP (fixed in 0.33). No Neovim-side workaround is needed.
 - **LSP servers**: configured with `vim.lsp.config()` in `lspconfig.lua`; mason-lspconfig v2 auto-enables installed servers (`automatic_enable.exclude` keeps stylua/ruff as tools only).
-- **KKP backspace fix**: `lua/keymaps/init.lua` contains a `vim.on_key` dedup for the Kitty Keyboard Protocol double-backspace bug; active under kitty (`KITTY_WINDOW_ID`) and herdr (`HERDR_ENV`).
 
 ### Active Plugin Summary
 

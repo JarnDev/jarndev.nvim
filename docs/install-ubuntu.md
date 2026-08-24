@@ -76,3 +76,12 @@ nvim
 ```
 
 Lazy.nvim installs all plugins on first launch. Run `:Lazy` to check status, `:Mason` to manage LSP servers.
+
+## Terminal: kitty (upstream, not apt)
+
+Ubuntu's `kitty` package (0.32.2 on 24.04) has a Kitty Keyboard Protocol bug that doubles
+Enter/Backspace in herdr and Neovim. Install upstream instead:
+
+```sh
+bash os-custom-config/linux/install-kitty.sh
+```
