@@ -5,7 +5,8 @@ return {
   opts = {
     bigfile = { enabled = true },
     image = {
-      enabled = true,
+      -- Only terminals with the kitty graphics protocol can render; skip detection elsewhere.
+      enabled = vim.env.KITTY_WINDOW_ID ~= nil or vim.env.WEZTERM_PANE ~= nil or vim.env.GHOSTTY_RESOURCES_DIR ~= nil,
       doc = {
         inline = false,
       },
