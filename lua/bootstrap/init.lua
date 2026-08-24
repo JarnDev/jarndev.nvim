@@ -2,13 +2,13 @@
 -- This file loads all bootstrap settings in the correct order
 
 -- Load core settings first (leader key, etc.)
-require('bootstrap.core')
+require 'bootstrap.core'
 
 -- Load UI settings (Nerd Font, etc.)
-require('bootstrap.ui')
+require 'bootstrap.ui'
 
 -- Load editor settings (termguicolors, etc.)
-require('bootstrap.editor')
+require 'bootstrap.editor'
 
 -- Return the module
-return {} 
+return {}

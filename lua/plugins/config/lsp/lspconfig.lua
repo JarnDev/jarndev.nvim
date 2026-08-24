@@ -13,27 +13,44 @@ return {
     vim.api.nvim_create_autocmd('LspAttach', {
       group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
       callback = function(event)
-        local map = function(keys, func, desc, mode)
+        local map = function(keys, func, desc, mode, extra)
           mode = mode or 'n'
-          vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
+          vim.keymap.set(mode, keys, func, vim.tbl_extend('force', { buffer = event.buf, desc = 'LSP: ' .. desc }, extra or {}))
         end
 
         -- Navigation via snacks.nvim picker
-        map('gd', function() Snacks.picker.lsp_definitions() end, '[G]oto [D]efinition')
-        map('gr', function() Snacks.picker.lsp_references() end, '[G]oto [R]eferences')
-        map('gI', function() Snacks.picker.lsp_implementations() end, '[G]oto [I]mplementation')
-        map('<leader>D', function() Snacks.picker.lsp_type_definitions() end, 'Type [D]efinition')
-        map('<leader>ds', function() Snacks.picker.lsp_document_symbols() end, '[D]ocument [S]ymbols')
-        map('<leader>ws', function() Snacks.picker.lsp_workspace_symbols() end, '[W]orkspace [S]ymbols')
-        vim.keymap.set('n', '<leader>cn', function()
-          return ':IncRename ' .. vim.fn.expand('<cword>')
-        end, { buffer = event.buf, expr = true, desc = 'LSP: [R]e[n]ame' })
+        map('gd', function()
+          Snacks.picker.lsp_definitions()
+        end, '[G]oto [D]efinition')
+        -- nowait: avoid the timeout caused by Neovim's builtin gr* mappings (grn/grr/gra/gri)
+        map('gr', function()
+          Snacks.picker.lsp_references()
+        end, '[G]oto [R]eferences', 'n', { nowait = true })
+        map('gI', function()
+          Snacks.picker.lsp_implementations()
+        end, '[G]oto [I]mplementation')
+        map('<leader>D', function()
+          Snacks.picker.lsp_type_definitions()
+        end, 'Type [D]efinition')
+        map('<leader>ds', function()
+          Snacks.picker.lsp_document_symbols()
+        end, '[D]ocument [S]ymbols')
+        map('<leader>ws', function()
+          Snacks.picker.lsp_workspace_symbols()
+        end, '[W]orkspace [S]ymbols')
+        map('<leader>cn', function()
+          return ':IncRename ' .. vim.fn.expand '<cword>'
+        end, 'Re[n]ame', 'n', { expr = true })
         map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
         map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
-        -- Highlight references
         local client = vim.lsp.get_client_by_id(event.data.client_id)
-        if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
+        if not client then
+          return
+        end
+
+        -- Highlight references
+        if client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
           local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
           vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
             buffer = event.buf,
@@ -57,18 +74,18 @@ return {
         end
 
         -- Inlay hints
-        if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
-          map('<leader>th', function()
+        if client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+          map('<leader>ch', function()
             vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
-          end, '[T]oggle Inlay [H]ints')
+          end, 'Toggle Inlay [H]ints')
         end
       end,
     })
 
-    -- LSP capabilities
-    local capabilities = vim.tbl_deep_extend('force', vim.lsp.protocol.make_client_capabilities(), require('blink.cmp').get_lsp_capabilities())
+    -- LSP capabilities (blink.cmp adds completion capabilities on top of the defaults)
+    local capabilities = require('blink.cmp').get_lsp_capabilities()
 
-    -- LSP servers configuration
+    -- LSP servers configuration. Keys are lspconfig server names; values are passed to vim.lsp.config().
     local servers = {
       lua_ls = {
         settings = {
@@ -86,27 +103,34 @@ return {
       tailwindcss = {},
       eslint = {},
       pyright = {},
+      marksman = {},
     }
+
+    for name, cfg in pairs(servers) do
+      cfg.capabilities = vim.tbl_deep_extend('force', {}, capabilities, cfg.capabilities or {})
+      vim.lsp.config(name, cfg)
+    end
 
     -- Mason setup
     require('mason').setup()
-    local ensure_installed = vim.tbl_keys(servers or {})
+    local ensure_installed = vim.tbl_keys(servers)
     vim.list_extend(ensure_installed, {
       'stylua',
       'markdownlint-cli2',
       'ruff',
       'prettierd',
       'eslint_d',
+      'tree-sitter-cli',
     })
     require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
+    -- mason-lspconfig v2 enables every installed server via vim.lsp.enable().
+    -- Exclude tools that also ship an LSP mode but are used here as formatters/linters
+    -- (stylua, ruff -> nvim-lint) and servers not in the `servers` table.
     require('mason-lspconfig').setup {
-      handlers = {
-        function(server_name)
-          local server = servers[server_name] or {}
-          server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-          require('lspconfig')[server_name].setup(server)
-        end,
+      ensure_installed = vim.tbl_keys(servers),
+      automatic_enable = {
+        exclude = { 'stylua', 'ruff', 'clangd', 'cmake', 'eslint_d' },
       },
     }
   end,

@@ -1,11 +1,8 @@
 -- Load core modules
-require('core.options')
+require 'core.options'
 
 -- Load keymaps
-require('keymaps')
-
--- Load utility functions
-require('utils')
+require 'keymaps'
 
 -- Load autocommands
-require('core.autocommands')
+require 'core.autocommands'

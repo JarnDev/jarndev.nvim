@@ -62,6 +62,7 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 - **Statusline**: lualine.nvim (mini.statusline is disabled in mini.lua).
 - **AI**: claudecode.nvim (CLI terminal integration) + codecompanion.nvim (Anthropic API chat/inline). copilot.vim stays for ghost-text completions.
 - **Hover**: hover.nvim (`K` = hover, `gK` = select provider). Configured in `lua/plugins/config/editor/hover.lua`.
+- **LSP servers**: configured with `vim.lsp.config()` in `lspconfig.lua`; mason-lspconfig v2 auto-enables installed servers (`automatic_enable.exclude` keeps stylua/ruff as tools only).
 - **KKP backspace fix**: `lua/keymaps/init.lua` contains a `vim.on_key` dedup for the Kitty Keyboard Protocol double-backspace bug.
 
 ### Active Plugin Summary
@@ -77,6 +78,17 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 | LSP | nvim-lspconfig + mason + fidget |
 | Testing | neotest (`<leader>tt/tf/ts/to/td`) |
 | UI | snacks.nvim (dashboard/picker/lazygit/terminal/indent/notifier/scroll), trouble (`<leader>xx/xd/xq`), lualine, noice, neo-tree, tokyonight |
+
+## External Dependencies
+
+`stylua`, `prettierd`, `eslint_d`, `ruff` and `markdownlint-cli2` are installed by Mason (`lspconfig.lua` `ensure_installed`) and are on `PATH` only inside Neovim. To run `stylua .` from a shell use `~/.local/share/jarndev.nvim/mason/bin/stylua` or install it globally (`cargo install stylua`).
+
+System binaries that must be installed separately:
+
+| Binary | Purpose | Install |
+|--------|---------|---------|
+| `mpv` | Video playback (`<leader>rv`) — launches detached in its own window | `sudo apt install mpv` |
+| `ollama` | Local models for minuet / codecompanion (`<leader>at`, `<leader>aL`) | https://ollama.com |
 
 ## Useful In-Editor Commands
 

@@ -15,7 +15,12 @@ return {
     },
   },
   opts = {
-    keymap = { preset = 'default' },
+    keymap = {
+      preset = 'default',
+      ['<Tab>'] = { 'snippet_forward', 'accept', 'fallback' },
+      ['<S-Tab>'] = { 'snippet_backward', 'fallback' },
+      ['<CR>'] = { 'fallback' },
+    },
     appearance = {
       nerd_font_variant = 'mono',
     },
@@ -24,7 +29,15 @@ return {
       accept = { auto_brackets = { enabled = true } },
     },
     sources = {
-      default = { 'lsp', 'path', 'snippets', 'buffer', 'copilot' },
+      -- minuet (Ollama) is only queried when the local engine is toggled on (<leader>at),
+      -- otherwise every keystroke would hit localhost:11434.
+      default = function()
+        local sources = { 'lsp', 'path', 'snippets', 'buffer', 'copilot' }
+        if vim.g.ai_engine_local then
+          table.insert(sources, 'minuet')
+        end
+        return sources
+      end,
       per_filetype = {
         sql = { 'dadbod', 'buffer' },
         mysql = { 'dadbod', 'buffer' },
@@ -36,6 +49,13 @@ return {
           score_offset = 100,
           async = true,
         },
+        minuet = {
+          name = 'minuet',
+          module = 'minuet.blink',
+          score_offset = 50,
+          async = true,
+          timeout_ms = 3000,
+        },
         dadbod = {
           name = 'Dadbod',
           module = 'blink.compat.source',
@@ -45,5 +65,4 @@ return {
     },
     snippets = { preset = 'luasnip' },
   },
-  opts_extend = { 'sources.default' },
 }

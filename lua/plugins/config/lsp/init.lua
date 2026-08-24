@@ -1,4 +1,4 @@
 return {
-  require('plugins.config.lsp.lspconfig'),
-  require('plugins.config.lsp.lazydev'),
+  { import = 'plugins.config.lsp.lspconfig' },
+  { import = 'plugins.config.lsp.lazydev' },
 }

@@ -3,6 +3,7 @@ return {
   { import = 'plugins.config.editor.which-key' },
   { import = 'plugins.config.editor.autopairs' },
   { import = 'plugins.config.editor.markdown' },
+  { import = 'plugins.config.editor.markdown-preview' },
   { import = 'plugins.config.editor.debug' },
   { import = 'plugins.config.editor.lint' },
   { import = 'plugins.config.editor.hover' },

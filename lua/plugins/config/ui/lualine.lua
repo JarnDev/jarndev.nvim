@@ -21,7 +21,7 @@ return {
         },
         {
           function()
-            local clients = vim.lsp.get_clients({ bufnr = 0 })
+            local clients = vim.lsp.get_clients { bufnr = 0 }
             local names = {}
             for _, c in ipairs(clients) do
               if c.name ~= 'copilot' then

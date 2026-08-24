@@ -1,3 +1,3 @@
 return {
-  require('plugins.config.formatting.conform'),
-} 
+  { import = 'plugins.config.formatting.conform' },
+}

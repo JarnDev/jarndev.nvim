@@ -2,8 +2,19 @@ return {
   'echasnovski/mini.nvim',
   config = function()
     require('mini.ai').setup { n_lines = 500 }
-    require('mini.surround').setup()
-    
+    -- Prefix `gs` so plain `s` is free for flash.nvim (no timeoutlen wait)
+    require('mini.surround').setup {
+      mappings = {
+        add = 'gsa',
+        delete = 'gsd',
+        find = 'gsf',
+        find_left = 'gsF',
+        highlight = 'gsh',
+        replace = 'gsr',
+        update_n_lines = 'gsn',
+      },
+    }
+
     -- mini.statusline disabled: lualine.nvim is used instead
     -- mini.tabline disabled: bufferline.nvim is used instead
 
@@ -23,4 +34,4 @@ return {
       },
     }
   end,
-} 
+}

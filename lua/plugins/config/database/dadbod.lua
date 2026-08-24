@@ -18,4 +18,4 @@ return {
     vim.g.db_ui_winposition = 'right'
     vim.g.db_ui_use_nvim_notify = 1
   end,
-} 
+}

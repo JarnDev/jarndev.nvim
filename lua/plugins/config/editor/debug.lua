@@ -5,13 +5,18 @@ return {
     'theHamsta/nvim-dap-virtual-text',
     'jay-babu/mason-nvim-dap.nvim',
   },
+  keys = {
+    { '<leader>db', desc = 'Toggle Breakpoint' },
+    { '<leader>dc', desc = 'Continue' },
+    { '<leader>du', desc = 'Toggle Debug UI' },
+  },
   config = function()
-    local dap = require('dap')
-    local dapui = require('dapui')
+    local dap = require 'dap'
+    local dapui = require 'dapui'
 
     require('nvim-dap-virtual-text').setup()
     require('dapui').setup()
-    require('mason-nvim-dap').setup({
+    require('mason-nvim-dap').setup {
       automatic_setup = true,
       handlers = {},
       ensure_installed = {
@@ -19,7 +24,7 @@ return {
         'delve',
         'js-debug-adapter',
       },
-    })
+    }
 
     -- Keymaps
     vim.keymap.set('n', '<leader>db', dap.toggle_breakpoint, { desc = 'Toggle Breakpoint' })
@@ -46,14 +51,14 @@ return {
         name = 'Launch file',
         program = '${file}',
         pythonPath = function()
-          return vim.fn.exepath('python3')
+          return vim.fn.exepath 'python3'
         end,
       },
     }
 
     -- JS/TS configuration (js-debug-adapter)
-    local js_debug = os.getenv('HOME') .. '/.local/share/jarndev.nvim/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js'
-    for _, adapter in ipairs({ 'node', 'pwa-node', 'pwa-chrome' }) do
+    local js_debug = vim.fn.stdpath 'data' .. '/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js'
+    for _, adapter in ipairs { 'node', 'pwa-node', 'pwa-chrome' } do
       dap.adapters[adapter] = {
         type = 'server',
         host = 'localhost',
@@ -96,7 +101,7 @@ return {
       },
     }
 
-    for _, lang in ipairs({ 'javascript', 'typescript', 'javascriptreact', 'typescriptreact' }) do
+    for _, lang in ipairs { 'javascript', 'typescript', 'javascriptreact', 'typescriptreact' } do
       dap.configurations[lang] = js_configs
     end
 
@@ -126,4 +131,4 @@ return {
       },
     }
   end,
-} 
+}

@@ -12,7 +12,9 @@ opt.showmode = false
 opt.signcolumn = 'yes'
 opt.cursorline = true
 opt.scrolloff = 10
-opt.conceallevel = 2  -- needed for render-markdown.nvim
+
+-- Sessions: auto-session needs localoptions so filetype/highlight restore correctly
+opt.sessionoptions:append 'localoptions'
 
 -- Clipboard
 vim.schedule(function()

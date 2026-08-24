@@ -9,12 +9,19 @@ return {
     'nvim-neotest/nvim-nio',
     'haydenmeade/neotest-jest',
   },
+  keys = {
+    { '<leader>tt', desc = 'Run nearest test' },
+    { '<leader>tf', desc = 'Run all tests in file' },
+    { '<leader>td', desc = 'Debug nearest test' },
+    { '<leader>ts', desc = 'Toggle test summary' },
+    { '<leader>to', desc = 'Show test output' },
+  },
   config = function()
-    require('neotest').setup({
+    require('neotest').setup {
       adapters = {
-        require('neotest-python'),
-        require('neotest-go'),
-        require('neotest-jest')({
+        require 'neotest-python',
+        require 'neotest-go',
+        require 'neotest-jest' {
           jestCommand = 'npx jest',
           jestConfigFile = function(file)
             if string.find(file, '/packages/') then
@@ -26,27 +33,27 @@ return {
           cwd = function()
             return vim.fn.getcwd()
           end,
-        }),
+        },
       },
       status = { virtual_text = true },
       output = { open_on_run = true },
       quickfix = {
         open = function()
-          vim.cmd('Trouble quickfix')
+          vim.cmd 'Trouble quickfix'
         end,
       },
-    })
+    }
 
     vim.keymap.set('n', '<leader>tt', function()
       require('neotest').run.run()
     end, { desc = 'Run nearest test' })
 
     vim.keymap.set('n', '<leader>tf', function()
-      require('neotest').run.run(vim.fn.expand('%'))
+      require('neotest').run.run(vim.fn.expand '%')
     end, { desc = 'Run all tests in file' })
 
     vim.keymap.set('n', '<leader>td', function()
-      require('neotest').run.run({ strategy = 'dap' })
+      require('neotest').run.run { strategy = 'dap' }
     end, { desc = 'Debug nearest test' })
 
     vim.keymap.set('n', '<leader>ts', function()
@@ -54,7 +61,7 @@ return {
     end, { desc = 'Toggle test summary' })
 
     vim.keymap.set('n', '<leader>to', function()
-      require('neotest').output.open({ enter = true })
+      require('neotest').output.open { enter = true }
     end, { desc = 'Show test output' })
   end,
 }

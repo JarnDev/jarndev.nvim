@@ -1,8 +1,8 @@
 -- Load bootstrap configuration (must be first)
-require('bootstrap')
+require 'bootstrap'
 
 -- Load core configuration
-require('core')
+require 'core'
 
 -- Load plugins
-require('plugins')
+require 'plugins'

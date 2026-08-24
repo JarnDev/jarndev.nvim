@@ -1,5 +1,5 @@
 return {
   'smjonas/inc-rename.nvim',
-  lazy = false,
+  cmd = 'IncRename',
   opts = {},
 }

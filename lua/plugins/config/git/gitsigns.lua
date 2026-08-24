@@ -18,31 +18,47 @@ return {
 
       -- Navigation
       map('n', ']c', function()
-        if vim.wo.diff then return ']c' end
-        vim.schedule(function() gs.next_hunk() end)
+        if vim.wo.diff then
+          return ']c'
+        end
+        vim.schedule(function()
+          gs.next_hunk()
+        end)
         return '<Ignore>'
       end, 'Next Hunk')
 
       map('n', '[c', function()
-        if vim.wo.diff then return '[c' end
-        vim.schedule(function() gs.prev_hunk() end)
+        if vim.wo.diff then
+          return '[c'
+        end
+        vim.schedule(function()
+          gs.prev_hunk()
+        end)
         return '<Ignore>'
       end, 'Previous Hunk')
 
       -- Actions
       map('n', '<leader>hs', gs.stage_hunk, 'Stage Hunk')
       map('n', '<leader>hr', gs.reset_hunk, 'Reset Hunk')
-      map('v', '<leader>hs', function() gs.stage_hunk { vim.fn.line('.'), vim.fn.line('v') } end, 'Stage Hunk')
-      map('v', '<leader>hr', function() gs.reset_hunk { vim.fn.line('.'), vim.fn.line('v') } end, 'Reset Hunk')
+      map('v', '<leader>hs', function()
+        gs.stage_hunk { vim.fn.line '.', vim.fn.line 'v' }
+      end, 'Stage Hunk')
+      map('v', '<leader>hr', function()
+        gs.reset_hunk { vim.fn.line '.', vim.fn.line 'v' }
+      end, 'Reset Hunk')
       map('n', '<leader>hS', gs.stage_buffer, 'Stage Buffer')
       map('n', '<leader>hu', gs.undo_stage_hunk, 'Undo Stage Hunk')
       map('n', '<leader>hR', gs.reset_buffer, 'Reset Buffer')
       map('n', '<leader>hp', gs.preview_hunk, 'Preview Hunk')
-      map('n', '<leader>hb', function() gs.blame_line { full = true } end, 'Blame Line')
-      map('n', '<leader>tb', gs.toggle_current_line_blame, 'Toggle Blame')
+      map('n', '<leader>hb', function()
+        gs.blame_line { full = true }
+      end, 'Blame Line')
+      map('n', '<leader>hB', gs.toggle_current_line_blame, 'Toggle line [B]lame')
       map('n', '<leader>hd', gs.diffthis, 'Diff This')
-      map('n', '<leader>hD', function() gs.diffthis('~') end, 'Diff This ~')
-      map('n', '<leader>td', gs.toggle_deleted, 'Toggle Deleted')
+      map('n', '<leader>hD', function()
+        gs.diffthis '~'
+      end, 'Diff This ~')
+      map('n', '<leader>ht', gs.toggle_deleted, '[T]oggle deleted')
     end,
   },
-} 
+}

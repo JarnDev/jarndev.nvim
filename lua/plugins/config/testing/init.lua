@@ -1,3 +1,3 @@
 return {
-  require('plugins.config.testing.neotest'),
+  { import = 'plugins.config.testing.neotest' },
 }

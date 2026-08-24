@@ -11,14 +11,14 @@ return {
     {
       '\\',
       function()
-        require('neo-tree.command').execute({ source = 'filesystem', toggle = true })
+        require('neo-tree.command').execute { source = 'filesystem', toggle = true }
       end,
       desc = 'Explorer NeoTree (root dir)',
     },
     {
       '<leader>E',
       function()
-        require('neo-tree.command').execute({ source = 'filesystem', toggle = true, dir = vim.uv.cwd() })
+        require('neo-tree.command').execute { source = 'filesystem', toggle = true, dir = vim.uv.cwd() }
       end,
       desc = 'Explorer NeoTree (cwd)',
     },
@@ -34,10 +34,25 @@ return {
         hide_gitignored = false,
       },
     },
+    commands = {
+      open_or_play = function(state)
+        local node = state.tree:get_node()
+        local path = node:get_id()
+        local ext = (path:match '%.(%w+)$' or ''):lower()
+        local video_exts = { mp4 = true, mkv = true, avi = true, mov = true, webm = true, flv = true, wmv = true, m4v = true }
+        if video_exts[ext] then
+          vim.fn.jobstart({ 'mpv', path }, { detach = true })
+          vim.notify('Playing: ' .. vim.fn.fnamemodify(path, ':t'))
+          return
+        end
+        require('neo-tree.sources.filesystem.commands').open(state)
+      end,
+    },
     window = {
       mappings = {
         ['<space>'] = 'none',
+        ['<CR>'] = 'open_or_play',
       },
     },
   },
-} 
+}
