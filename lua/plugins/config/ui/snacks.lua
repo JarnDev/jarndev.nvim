@@ -36,14 +36,14 @@ return {
       },
       -- Single column: the full JarnDev logo (cat + wordmark) rendered by chafa as one
       -- item, then the lists. Without chafa the section is skipped and the ASCII header shows.
-      width = 60,
+      width = 70,
       sections = {
         {
           section = 'terminal',
-          cmd = ('chafa %s --format symbols --symbols vhalf --colors full --size 60x24; sleep .1'):format(
+          cmd = ('chafa %s --format symbols --symbols block --colors 2 --fg-only --dither none --work 9 --size 70x28; sleep .1'):format(
             vim.fn.shellescape(vim.fn.stdpath 'config' .. '/assets/logo.png')
           ),
-          height = 24,
+          height = 28,
           padding = 1,
           enabled = function()
             return vim.fn.executable 'chafa' == 1
