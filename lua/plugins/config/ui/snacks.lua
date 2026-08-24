@@ -48,6 +48,36 @@ local function place_logo(buf)
   })
 end
 
+-- chafa fallback: render once as monochrome block characters and cache the text.
+local chafa_cache ---@type string?
+local function chafa_logo()
+  if chafa_cache then
+    return chafa_cache
+  end
+  local out = vim.fn.system {
+    'chafa',
+    LOGO,
+    '--format',
+    'symbols',
+    '--symbols',
+    'block+space',
+    '--colors',
+    'none',
+    '--dither',
+    'none',
+    '--work',
+    '9',
+    '--size',
+    '70x28',
+  }
+  if vim.v.shell_error ~= 0 then
+    return ''
+  end
+  out = out:gsub('\27%[[%d;?]*[A-Za-z]', ''):gsub('%s+$', '')
+  chafa_cache = out
+  return out
+end
+
 vim.api.nvim_create_autocmd('User', {
   pattern = { 'SnacksDashboardOpened', 'SnacksDashboardUpdatePost' },
   group = vim.api.nvim_create_augroup('jarndev-dashboard-logo', { clear = true }),
@@ -110,17 +140,14 @@ return {
           padding = 1,
           enabled = logo_image_ok,
         },
-        {
-          section = 'terminal',
-          cmd = ('chafa %s --format symbols --symbols block+space --colors 2 --fg-only --dither none --work 9 --size 70x28; sleep .1'):format(
-            vim.fn.shellescape(LOGO)
-          ),
-          height = 28,
-          padding = 1,
-          enabled = function()
-            return not logo_image_ok() and vim.fn.executable 'chafa' == 1
-          end,
-        },
+        -- Tier 2: chafa block-art as plain header text (scrolls with the page, unlike a
+        -- `terminal` section which is a fixed floating window).
+        function()
+          if logo_image_ok() or vim.fn.executable 'chafa' ~= 1 then
+            return
+          end
+          return { header = chafa_logo(), padding = 1 }
+        end,
         {
           section = 'header',
           enabled = function()
