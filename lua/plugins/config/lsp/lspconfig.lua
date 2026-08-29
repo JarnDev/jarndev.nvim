@@ -7,8 +7,12 @@ return {
     'WhoIsSethDaniel/mason-tool-installer.nvim',
     { 'j-hui/fidget.nvim', opts = {} },
     'saghen/blink.cmp',
+    'folke/neoconf.nvim',
   },
   config = function()
+    -- Must run before any vim.lsp.config() call below so project-local `.neoconf.json`
+    -- settings are merged into each server's config.
+    require('neoconf').setup {}
     -- LSP keymaps
     vim.api.nvim_create_autocmd('LspAttach', {
       group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
@@ -43,6 +47,11 @@ return {
         end, 'Re[n]ame', 'n', { expr = true })
         map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
         map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+
+        -- Call hierarchy ("who calls this?" / "what does this call?") via trouble's
+        -- lsp_incoming_calls / lsp_outgoing_calls modes -- snacks.picker has no source for these.
+        map('<leader>ci', '<cmd>Trouble lsp_incoming_calls toggle<cr>', '[C]alls [I]ncoming')
+        map('<leader>co', '<cmd>Trouble lsp_outgoing_calls toggle<cr>', '[C]alls [O]utgoing')
 
         local client = vim.lsp.get_client_by_id(event.data.client_id)
         if not client then
@@ -104,6 +113,32 @@ return {
       eslint = {},
       pyright = {},
       marksman = {},
+
+      -- Shell / config formats
+      bashls = {},
+      yamlls = {},
+      taplo = {},
+      dockerls = {},
+
+      -- C / C++. clangd reads compile_commands.json when present (cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1);
+      -- for standalone study files it falls back to --fallback-style and default flags.
+      clangd = {
+        cmd = {
+          'clangd',
+          '--background-index',
+          '--clang-tidy',
+          '--header-insertion=iwyu',
+          '--completion-style=detailed',
+          '--function-arg-placeholders',
+          '--fallback-style=llvm',
+        },
+        init_options = {
+          usePlaceholders = true,
+          completeUnimported = true,
+          clangdFileStatus = true,
+        },
+      },
+      cmake = {},
     }
 
     for name, cfg in pairs(servers) do
@@ -111,26 +146,34 @@ return {
       vim.lsp.config(name, cfg)
     end
 
-    -- Mason setup
+    -- Mason setup.
+    --
+    -- The two installers take DIFFERENT name spaces and must not be mixed:
+    --   * mason-tool-installer takes mason *package* names ('lua-language-server').
+    --   * mason-lspconfig takes *lspconfig* server names ('lua_ls') and maps them itself.
+    -- Passing lspconfig names to mason-tool-installer makes it silently skip them, so the
+    -- `servers` keys go to mason-lspconfig only and this list holds standalone tools.
     require('mason').setup()
-    local ensure_installed = vim.tbl_keys(servers)
-    vim.list_extend(ensure_installed, {
-      'stylua',
-      'markdownlint-cli2',
-      'ruff',
-      'prettierd',
-      'eslint_d',
-      'tree-sitter-cli',
-    })
-    require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+    require('mason-tool-installer').setup {
+      ensure_installed = {
+        'stylua',
+        'markdownlint-cli2',
+        'prettierd',
+        'eslint_d',
+        'tree-sitter-cli',
+        'shellcheck', -- bashls only emits diagnostics through shellcheck
+        'clang-format',
+        'cmakelang', -- provides cmake-format (conform: cmake filetype)
+      },
+    }
 
-    -- mason-lspconfig v2 enables every installed server via vim.lsp.enable().
-    -- Exclude tools that also ship an LSP mode but are used here as formatters/linters
-    -- (stylua, ruff -> nvim-lint) and servers not in the `servers` table.
+    -- mason-lspconfig v2 installs `ensure_installed` and enables every installed server
+    -- via vim.lsp.enable(). Exclude tools that also ship an LSP mode but are used here as
+    -- formatters/linters (stylua, ruff -> nvim-lint, eslint_d -> nvim-lint).
     require('mason-lspconfig').setup {
       ensure_installed = vim.tbl_keys(servers),
       automatic_enable = {
-        exclude = { 'stylua', 'ruff', 'clangd', 'cmake', 'eslint_d' },
+        exclude = { 'stylua', 'ruff', 'eslint_d' },
       },
     }
   end,

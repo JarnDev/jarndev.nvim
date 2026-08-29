@@ -8,4 +8,9 @@ return {
   { import = 'plugins.config.ui.trouble' },
   { import = 'plugins.config.ui.lualine' },
   { import = 'plugins.config.ui.bufferline' },
+  { import = 'plugins.config.ui.window-picker' },
+  { import = 'plugins.config.ui.smear-cursor' },
+  { import = 'plugins.config.ui.nvzone' },
+  { import = 'plugins.config.ui.startuptime' },
+  { import = 'plugins.config.ui.edgy' },
 }

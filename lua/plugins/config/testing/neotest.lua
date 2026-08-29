@@ -5,7 +5,6 @@ return {
     'nvim-treesitter/nvim-treesitter',
     'antoinemadec/FixCursorHold.nvim',
     'nvim-neotest/neotest-python',
-    'nvim-neotest/neotest-go',
     'nvim-neotest/nvim-nio',
     'haydenmeade/neotest-jest',
   },
@@ -20,7 +19,6 @@ return {
     require('neotest').setup {
       adapters = {
         require 'neotest-python',
-        require 'neotest-go',
         require 'neotest-jest' {
           jestCommand = 'npx jest',
           jestConfigFile = function(file)

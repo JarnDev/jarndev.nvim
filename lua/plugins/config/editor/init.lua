@@ -13,4 +13,12 @@ return {
   { import = 'plugins.config.editor.sessions' },
   { import = 'plugins.config.editor.flash' },
   { import = 'plugins.config.editor.inc-rename' },
+  { import = 'plugins.config.editor.harpoon' },
+  { import = 'plugins.config.editor.refactoring' },
+  { import = 'plugins.config.editor.ts-comments' },
+  { import = 'plugins.config.editor.overseer' },
+  { import = 'plugins.config.editor.neogen' },
+  { import = 'plugins.config.editor.dial' },
+  { import = 'plugins.config.editor.yanky' },
+  { import = 'plugins.config.editor.smart-splits' },
 }

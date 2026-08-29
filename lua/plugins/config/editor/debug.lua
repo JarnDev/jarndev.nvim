@@ -21,7 +21,7 @@ return {
       handlers = {},
       ensure_installed = {
         'python',
-        'delve',
+        'codelldb',
         'js-debug-adapter',
       },
     }
@@ -105,30 +105,52 @@ return {
       dap.configurations[lang] = js_configs
     end
 
-    -- Go configuration
-    dap.adapters.delve = {
+    -- C / C++ configuration (codelldb; bundles its own lldb, so no system gdb needed)
+    dap.adapters.codelldb = {
       type = 'server',
       port = '${port}',
       executable = {
-        command = 'dlv',
-        args = { 'dap', '-l', '127.0.0.1:${port}' },
+        command = vim.fn.exepath 'codelldb',
+        args = { '--port', '${port}' },
       },
     }
 
-    dap.configurations.go = {
+    -- Compile the current file with debug symbols next to it and hand the binary to dap.
+    -- Returning dap.ABORT cancels the session cleanly when the build fails.
+    local function build_current_file()
+      local src = vim.fn.expand '%:p'
+      local out = vim.fn.expand '%:p:r'
+      local cc = vim.bo.filetype == 'cpp' and 'g++' or 'gcc'
+      local result = vim.system({ cc, '-g', '-O0', src, '-o', out }, { text = true }):wait()
+      if result.code ~= 0 then
+        vim.notify(result.stderr or 'build failed', vim.log.levels.ERROR, { title = cc .. ' failed' })
+        return dap.ABORT
+      end
+      return out
+    end
+
+    local c_configs = {
       {
-        type = 'delve',
-        name = 'Debug',
+        name = 'Build & debug current file',
+        type = 'codelldb',
         request = 'launch',
-        program = '${file}',
+        program = build_current_file,
+        cwd = '${workspaceFolder}',
+        stopOnEntry = false,
       },
       {
-        type = 'delve',
-        name = 'Debug test',
+        name = 'Launch executable (prompt)',
+        type = 'codelldb',
         request = 'launch',
-        mode = 'test',
-        program = '${file}',
+        program = function()
+          return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+        end,
+        cwd = '${workspaceFolder}',
+        stopOnEntry = false,
       },
     }
+
+    dap.configurations.c = c_configs
+    dap.configurations.cpp = c_configs
   end,
 }

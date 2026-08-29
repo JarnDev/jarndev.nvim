@@ -15,13 +15,13 @@ return {
     },
     opts = {
       notify_on_error = false,
-      format_on_save = function(bufnr)
-        local disable_filetypes = { c = true, cpp = true }
-        local lsp_format_opt = disable_filetypes[vim.bo[bufnr].filetype] and 'never' or 'fallback'
-        return { timeout_ms = 500, lsp_format = lsp_format_opt }
-      end,
+      format_on_save = { timeout_ms = 500, lsp_format = 'fallback' },
       formatters_by_ft = {
         lua = { 'stylua' },
+        -- LLVM style unless the project ships a .clang-format
+        c = { 'clang-format' },
+        cpp = { 'clang-format' },
+        cmake = { 'cmake_format' },
         python = { 'ruff_format', 'ruff_organize_imports' },
         javascript = { 'prettierd' },
         typescript = { 'prettierd' },

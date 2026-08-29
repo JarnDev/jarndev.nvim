@@ -20,10 +20,16 @@ map('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
 map('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 map('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
--- Window navigation
-map('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+-- Window navigation lives in plugins/config/editor/smart-splits.lua (<C-hjkl> to move,
+-- <A-hjkl> to resize) so the same keys can cross into adjacent kitty panes.
 
-map('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+-- LSP reference navigation. snacks.words is enabled in snacks.lua but binds no keys itself.
+map({ 'n', 't' }, ']]', function()
+  Snacks.words.jump(vim.v.count1)
+end, { desc = 'Next reference' })
+map({ 'n', 't' }, '[[', function()
+  Snacks.words.jump(-vim.v.count1)
+end, { desc = 'Previous reference' })
 
 -- Vim special keys reference drawer
 map('n', '<leader>?', function()
@@ -38,9 +44,6 @@ map('n', '<leader>?', function()
     keys = { q = 'close', ['<Esc>'] = 'close' },
   }
 end, { desc = 'Vim keys reference' })
-
-map('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-map('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- Play video under cursor (or entered path) with mpv in its own window
 map('n', '<leader>rv', function()
