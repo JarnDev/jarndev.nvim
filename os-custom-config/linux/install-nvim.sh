@@ -51,6 +51,15 @@ fi
 [ "$DISTRO" = unknown ] && command -v apt-get >/dev/null && DISTRO=debian
 log "distro detectada: ${PRETTY_NAME:-desconhecida}  ->  familia: $DISTRO"
 
+# Which rc file to write PATH into. Omarchy defaults to bash and has no zsh at all,
+# so targeting ~/.zshenv there would create an orphan file, report success, and leave
+# the PATH unset -- the exact failure this step exists to prevent.
+case "$(basename "${SHELL:-sh}")" in
+  zsh)  SHELL_ENV="$HOME/.zshenv"; SHELL_RC="$HOME/.zshrc" ;;
+  bash) SHELL_ENV="$HOME/.bashrc"; SHELL_RC="$HOME/.bashrc" ;;
+  *)    SHELL_ENV="";              SHELL_RC="" ;;   # fish/nu: different export syntax
+esac
+
 # Wayland (Omarchy/Hyprland) needs wl-clipboard; X11 needs xclip.
 if [ "${XDG_SESSION_TYPE:-}" = wayland ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
   CLIP_PKG_debian=wl-clipboard; CLIP_PKG_arch=wl-clipboard; CLIP_BIN=wl-copy
@@ -91,7 +100,7 @@ fi
 
 # Debian ships fd as fdfind; Arch ships it as fd already.
 if command -v fdfind >/dev/null && ! command -v fd >/dev/null; then
-  mkdir -p "$HOME/.local/bin"
+  [ "$CHECK_ONLY" = 0 ] && mkdir -p "$HOME/.local/bin"
   run ln -sf "$(command -v fdfind)" "$HOME/.local/bin/fd"
   log "symlink fd -> fdfind criado em ~/.local/bin"
 fi
@@ -118,13 +127,14 @@ else
     todo+=("sudo apt remove neovim neovim-runtime   # remove o duplicado do apt")
   }
   log "instalando neovim $NVIM_VERSION em /opt (atual: ${sys_minor:+0.$sys_minor}${sys_minor:-nenhum})"
-  tmp="$(mktemp -d)"
+  tmp=/tmp/nvim-setup-download
+  [ "$CHECK_ONLY" = 0 ] && tmp="$(mktemp -d)"
   run curl -fsSL -o "$tmp/nvim.tar.gz" \
     "https://github.com/neovim/neovim/releases/download/$NVIM_VERSION/nvim-linux-x86_64.tar.gz"
   run sudo rm -rf /opt/nvim-linux-x86_64
   run sudo tar -C /opt -xzf "$tmp/nvim.tar.gz"
   run sudo ln -sf /opt/nvim-linux-x86_64/bin/nvim /usr/local/bin/nvim
-  rm -rf "$tmp"
+  [ "$CHECK_ONLY" = 0 ] && rm -rf "$tmp"
 fi
 
 # --------------------------------------------------------------------------- node
@@ -134,7 +144,12 @@ fi
 node_major() { "$1/node" --version 2>/dev/null | sed 's/^v//; s/\..*//'; }
 
 node_bin=""
-if [ -d "$HOME/.nvm/versions/node" ]; then
+# mise (Omarchy's default version manager) exposes version-agnostic shims. Point at
+# those, never at .../installs/node/<version>/bin -- that pins the version and breaks
+# on the next `mise up node`.
+if [ -x "$HOME/.local/share/mise/shims/node" ]; then
+  node_bin="$HOME/.local/share/mise/shims"
+elif [ -d "$HOME/.nvm/versions/node" ]; then
   node_bin="$(find "$HOME/.nvm/versions/node" -maxdepth 2 -type d -name bin 2>/dev/null | sort -V | tail -1)"
 fi
 if [ -z "$node_bin" ] && command -v node >/dev/null; then
@@ -155,16 +170,20 @@ if [ -z "$node_bin" ]; then
     *)    todo+=("instale o Node >= $NODE_MIN_MAJOR (nvm install --lts) e rode este script de novo") ;;
   esac
 elif [ "$node_bin" = /usr/bin ] || [ "$node_bin" = /usr/local/bin ]; then
-  # A distro node already on the default PATH needs no .zshenv entry.
+  # A distro node already on the default PATH needs no rc entry.
   skip "node do sistema (v$(node_major "$node_bin")) ja no PATH"
-elif grep -qs 'versions/node' "$HOME/.zshenv" 2>/dev/null; then
-  skip "node no PATH via ~/.zshenv"
+elif [ -z "$SHELL_ENV" ]; then
+  warn "shell $(basename "${SHELL:-?}") nao suportado para edicao automatica de PATH"
+  todo+=("adicione ao rc do seu shell:  PATH=\"$node_bin:\$PATH\"")
+elif grep -qs "$node_bin" "$SHELL_ENV" 2>/dev/null; then
+  skip "node no PATH via $(basename "$SHELL_ENV")"
 else
-  log "adicionando node ao PATH em ~/.zshenv ($node_bin)"
-  [ "$CHECK_ONLY" = 0 ] && cat >> "$HOME/.zshenv" <<EOF
+  log "adicionando node ao PATH em $SHELL_ENV ($node_bin)"
+  [ "$CHECK_ONLY" = 0 ] && cat >> "$SHELL_ENV" <<EOF
 
-# nvm define node/npm como funcoes lazy no .zshrc, que nao existem em shells
-# nao-interativos. Sem isto nenhum LSP baseado em Node inicia dentro do Neovim.
+# Gerenciadores de versao (nvm/mise) expoem node/npm como funcoes ou shims que nao
+# existem em shells nao-interativos. Sem isto nenhum LSP baseado em Node inicia
+# dentro do Neovim, que executa os servidores diretamente.
 export PATH="$node_bin:\$PATH"
 EOF
 fi
@@ -184,7 +203,11 @@ fi
 # smart-splits can only cross pane boundaries on kitty, wezterm, tmux and zellij.
 # Omarchy's default terminal is neither, so there the <C-hjkl> keys stay Neovim-only.
 KITTY_CONF="$HOME/.config/kitty/kitty.conf"
-if [ -f "$KITTY_CONF" ]; then
+# Test for the binary, not the file: Omarchy ships themed configs for kitty, ghostty,
+# alacritty and foot regardless of which is installed, so a kitty.conf proves nothing.
+# Appending `allow_remote_control yes` to a config for an absent terminal would also be
+# a security-relevant change made for no reason.
+if command -v kitty >/dev/null && [ -f "$KITTY_CONF" ]; then
   if grep -q "IS_NVIM" "$KITTY_CONF"; then
     skip "mapeamentos smart-splits no kitty.conf"
   else
@@ -253,9 +276,15 @@ EOF
     fi
     todo+=("recarregue o tmux:  tmux source-file $TMUX_CONF")
   fi
-elif [ ! -f "$KITTY_CONF" ]; then
+elif ! command -v kitty >/dev/null; then
   log "sem kitty nem tmux -- <C-hjkl> navega apenas entre splits do Neovim"
   log "  (smart-splits so cruza panes em kitty, wezterm, tmux e zellij)"
+fi
+
+# Some distros (Omarchy) generate and version the terminal/tmux configs themselves, so
+# anything appended here can be overwritten by a system update.
+if [ "${ID:-}" = omarchy ]; then
+  todo+=("os configs de terminal/tmux sao gerenciados pelo Omarchy -- se um update sobrescrever, rode este script de novo")
 fi
 
 # ----------------------------------------------------------------- plugins + mason
@@ -277,16 +306,16 @@ else
 fi
 
 # --------------------------------------------------------------------------- shell
-if grep -qs "NVIM_APPNAME" "$HOME/.zshrc" 2>/dev/null; then
-  skip "NVIM_APPNAME no .zshrc"
+if [ -n "$SHELL_RC" ] && grep -qs "NVIM_APPNAME" "$SHELL_RC" 2>/dev/null; then
+  skip "NVIM_APPNAME em $(basename "$SHELL_RC")"
 elif [ -d "$HOME/.config/nvim" ]; then
   # Omarchy ships its own Neovim config (LazyVim) at ~/.config/nvim, and its `n` alias
   # plus the Setup > Configs menu both target it. A global export would hijack all of
   # that, so alias this profile instead of making it the default.
   log "ja existe outra config em ~/.config/nvim -- nao torne esta a padrao globalmente"
-  todo+=("alias jn='NVIM_APPNAME=$APPNAME nvim'   # ~/.zshrc: mantem a config existente intacta")
+  todo+=("alias jn='NVIM_APPNAME=$APPNAME nvim'   # ${SHELL_RC:-rc do shell}: mantem a config existente intacta")
 else
-  todo+=("export NVIM_APPNAME=\"$APPNAME\"   # adicione ao ~/.zshrc para 'nvim' usar este perfil")
+  todo+=("export NVIM_APPNAME=\"$APPNAME\"   # adicione ao ${SHELL_RC:-rc do shell} para 'nvim' usar este perfil")
 fi
 
 command -v gh >/dev/null && gh auth status >/dev/null 2>&1 \
