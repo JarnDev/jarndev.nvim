@@ -39,6 +39,24 @@ Optional system binaries: `mpv` (video), `chafa` (dashboard logo fallback), `oll
 This config is designed to run under a named Neovim profile rather than replacing
 `~/.config/nvim`, so it can live alongside other configurations:
 
+### Automated (Debian / Ubuntu)
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/JarnDev/jarndev.nvim/master/os-custom-config/linux/install-nvim.sh | bash
+```
+
+Installs the apt prerequisites, Neovim into `/opt`, clones this repo, puts Node on
+`PATH` via `~/.zshenv`, appends the kitty mappings, and runs the lazy + Mason
+bootstrap. It is idempotent — every step checks the target state first — and prints
+whatever manual steps are left. Use `--check` to see what it would do without
+changing anything:
+
+```sh
+bash os-custom-config/linux/install-nvim.sh --check
+```
+
+### Manual
+
 ```sh
 git clone git@github.com:JarnDev/jarndev.nvim.git ~/.config/jarndev.nvim
 NVIM_APPNAME=jarndev.nvim nvim
@@ -58,9 +76,10 @@ completely separate from any other Neovim setup.
 
 ## Required Setup
 
-Some features need one-time host configuration and **fail silently** without it — the
-capability is simply absent rather than erroring. These are documented in full, with
-verification commands, in **[CLAUDE.md → Required Setup](CLAUDE.md#required-setup)**:
+`install-nvim.sh` performs steps 1 and 3 automatically. Everything below is documented
+in full, with verification commands, in
+**[CLAUDE.md → Required Setup](CLAUDE.md#required-setup)**. These fail **silently** when
+missing — the capability is simply absent rather than erroring:
 
 1. **Node on `PATH`** — if `node`/`npm` come from lazy nvm shell functions, no Node LSP
    (`ts_ls`, `eslint`, `jsonls`, `html`, `cssls`, `tailwindcss`, `bashls`, `yamlls`,

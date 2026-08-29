@@ -115,6 +115,11 @@ One-time steps the config depends on. Each of these fails **silently** — the
 feature is simply absent rather than erroring — so verify them rather than
 assuming.
 
+`os-custom-config/linux/install-nvim.sh` automates steps 1 and 3 (and the apt
+packages, Neovim install, clone and lazy/Mason bootstrap). It is idempotent and
+supports `--check` to report without changing anything. Steps 2, 4 and 5 stay
+manual: `gh auth login` is interactive, and 4/5 are per-project or optional.
+
 ### 1. Put Node on `PATH` (blocking — breaks every Node LSP)
 
 `node` and `npm` are **lazy nvm shell functions** defined in `~/.zshrc`, and no
