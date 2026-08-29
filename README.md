@@ -39,17 +39,18 @@ Optional system binaries: `mpv` (video), `chafa` (dashboard logo fallback), `oll
 This config is designed to run under a named Neovim profile rather than replacing
 `~/.config/nvim`, so it can live alongside other configurations:
 
-### Automated (Debian / Ubuntu)
+### Automated (Debian/Ubuntu and Arch/Omarchy)
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/JarnDev/jarndev.nvim/master/os-custom-config/linux/install-nvim.sh | bash
 ```
 
-Installs the apt prerequisites, Neovim into `/opt`, clones this repo, puts Node on
-`PATH` via `~/.zshenv`, appends the kitty mappings, and runs the lazy + Mason
-bootstrap. It is idempotent — every step checks the target state first — and prints
-whatever manual steps are left. Use `--check` to see what it would do without
-changing anything:
+Installs the system prerequisites (`apt` or `pacman`), Neovim, clones this repo, puts
+Node on `PATH`, wires up the terminal, and runs the lazy + Mason bootstrap. Everything
+is detected rather than assumed — package manager, Wayland vs X11 clipboard, terminal,
+and whether a usable Neovim is already present — so it degrades sanely on an unfamiliar
+distro instead of doing the wrong thing. It is idempotent, and prints whatever manual
+steps are left. Use `--check` to see what it would do without changing anything:
 
 ```sh
 bash os-custom-config/linux/install-nvim.sh --check

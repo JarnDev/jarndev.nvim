@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
-# Full setup for the jarndev.nvim Neovim profile on a fresh Debian/Ubuntu machine.
+# Full setup for the jarndev.nvim Neovim profile.
+#
+# Supports Debian/Ubuntu (apt) and Arch/Omarchy (pacman). Everything is *detected*
+# rather than assumed -- package manager, session type, terminal, existing Neovim --
+# so it degrades sanely on a distro or desktop it has not seen before.
 #
 # Idempotent: every step checks the target state first and skips if already met, so
-# re-running it is safe and touches nothing it does not have to. sudo is only invoked
-# for steps that genuinely need it (apt packages, /opt), and only when they are missing.
+# re-running is safe and sudo is only invoked for steps that genuinely need it.
 #
 # Usage:
 #   bash install-nvim.sh            # install / update everything
@@ -13,7 +16,9 @@
 #   curl -fsSL https://raw.githubusercontent.com/JarnDev/jarndev.nvim/master/os-custom-config/linux/install-nvim.sh | bash
 set -euo pipefail
 
-NVIM_VERSION="${NVIM_VERSION:-v0.12.5}"
+NVIM_VERSION="${NVIM_VERSION:-v0.12.5}"   # used only when we have to install it ourselves
+NVIM_MIN_MINOR=11                          # config needs >= 0.11 (vim.lsp.config, vim.hl)
+NODE_MIN_MAJOR=20
 REPO_URL="${REPO_URL:-https://github.com/JarnDev/jarndev.nvim.git}"
 CONFIG_DIR="${CONFIG_DIR:-$HOME/.config/jarndev.nvim}"
 APPNAME="jarndev.nvim"
@@ -24,52 +29,100 @@ log()  { printf '[nvim-setup] %s\n' "$*"; }
 warn() { printf '[nvim-setup] !! %s\n' "$*" >&2; }
 skip() { printf '[nvim-setup] .. %s (ja ok)\n' "$*"; }
 todo=()
-
-run() { # run, or just report under --check
+run() {
   if [ "$CHECK_ONLY" = 1 ]; then printf '[nvim-setup] would run: %s\n' "$*"; return 0; fi
   "$@"
 }
 
-# --------------------------------------------------------------------------- apt
-APT_PKGS=(git make unzip curl gcc g++ gdb ripgrep fd-find xclip python3-venv)
-missing=()
-for p in "${APT_PKGS[@]}"; do
-  dpkg -s "$p" >/dev/null 2>&1 || missing+=("$p")
-done
-if [ ${#missing[@]} -eq 0 ]; then
-  skip "pacotes apt"
+# ------------------------------------------------------------------- distro/session
+DISTRO=unknown
+OS_RELEASE="${OS_RELEASE:-/etc/os-release}"   # overridable so the detection can be tested
+if [ -r "$OS_RELEASE" ]; then
+  # shellcheck source=/dev/null
+  . "$OS_RELEASE"
+  case " ${ID:-} ${ID_LIKE:-} " in
+    *" debian "*|*" ubuntu "*) DISTRO=debian ;;
+    *" arch "*)                DISTRO=arch ;;
+  esac
+  # Omarchy identifies as its own ID with arch in ID_LIKE; the case above catches it,
+  # but fall back on the package manager if a distro invents its own identifiers.
+fi
+[ "$DISTRO" = unknown ] && command -v pacman  >/dev/null && DISTRO=arch
+[ "$DISTRO" = unknown ] && command -v apt-get >/dev/null && DISTRO=debian
+log "distro detectada: ${PRETTY_NAME:-desconhecida}  ->  familia: $DISTRO"
+
+# Wayland (Omarchy/Hyprland) needs wl-clipboard; X11 needs xclip.
+if [ "${XDG_SESSION_TYPE:-}" = wayland ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
+  CLIP_PKG_debian=wl-clipboard; CLIP_PKG_arch=wl-clipboard; CLIP_BIN=wl-copy
 else
-  log "instalando pacotes apt: ${missing[*]}"
-  run sudo apt-get update -qq
-  run sudo apt-get install -y "${missing[@]}"
+  CLIP_PKG_debian=xclip;        CLIP_PKG_arch=xclip;        CLIP_BIN=xclip
 fi
 
-# Ubuntu ships fd as fdfind; snacks finds either, but `fd` is the conventional name.
+# ----------------------------------------------------------------------- packages
+pkg_installed() {
+  case "$DISTRO" in
+    debian) dpkg -s "$1" >/dev/null 2>&1 ;;
+    arch)   pacman -Q "$1" >/dev/null 2>&1 ;;
+    *)      return 0 ;;   # unknown distro: never claim something is missing
+  esac
+}
+
+case "$DISTRO" in
+  debian) PKGS=(git make unzip curl gcc g++ gdb ripgrep fd-find python3-venv "$CLIP_PKG_debian") ;;
+  arch)   PKGS=(git base-devel unzip curl gdb ripgrep fd python "$CLIP_PKG_arch") ;;
+  *)      PKGS=() ;;
+esac
+
+if [ ${#PKGS[@]} -eq 0 ]; then
+  warn "distro nao reconhecida; instale manualmente: git make unzip curl gcc gdb ripgrep fd $CLIP_BIN"
+else
+  missing=()
+  for p in "${PKGS[@]}"; do pkg_installed "$p" || missing+=("$p"); done
+  if [ ${#missing[@]} -eq 0 ]; then
+    skip "pacotes do sistema"
+  else
+    log "instalando: ${missing[*]}"
+    case "$DISTRO" in
+      debian) run sudo apt-get update -qq && run sudo apt-get install -y "${missing[@]}" ;;
+      arch)   run sudo pacman -S --needed --noconfirm "${missing[@]}" ;;
+    esac
+  fi
+fi
+
+# Debian ships fd as fdfind; Arch ships it as fd already.
 if command -v fdfind >/dev/null && ! command -v fd >/dev/null; then
   mkdir -p "$HOME/.local/bin"
   run ln -sf "$(command -v fdfind)" "$HOME/.local/bin/fd"
-  log "criado symlink fd -> fdfind em ~/.local/bin"
+  log "symlink fd -> fdfind criado em ~/.local/bin"
 fi
 
 # ------------------------------------------------------------------------- neovim
-# The distro package is a trap: Ubuntu's neovim is old (and the PPA ships -dev builds),
-# and having both shadows whichever comes first on PATH.
-if dpkg -s neovim >/dev/null 2>&1; then
-  warn "existe um neovim instalado via apt que vai conflitar com o de /opt."
-  todo+=("sudo apt remove neovim neovim-runtime   # remove o duplicado do apt")
-fi
+nvim_minor() { "$1" --version 2>/dev/null | head -1 | sed 's/^NVIM v[0-9]*\.\([0-9]*\).*/\1/'; }
 
-current="$(/opt/nvim-linux-x86_64/bin/nvim --version 2>/dev/null | head -1 | awk '{print $2}' || true)"
-if [ "$current" = "$NVIM_VERSION" ]; then
-  skip "neovim $NVIM_VERSION"
+sys_nvim="$(command -v nvim || true)"
+sys_minor=""
+[ -n "$sys_nvim" ] && sys_minor="$(nvim_minor "$sys_nvim")"
+
+if [ -n "$sys_minor" ] && [ "$sys_minor" -ge "$NVIM_MIN_MINOR" ] 2>/dev/null; then
+  # Arch/Omarchy ship a current Neovim; installing our own into /opt would create the
+  # exact PATH-shadowing duplicate this script warns about on Debian. Leave it alone.
+  skip "neovim $("$sys_nvim" --version | head -1 | awk '{print $2}') em $sys_nvim"
+elif [ "$DISTRO" = arch ]; then
+  log "instalando neovim via pacman"
+  run sudo pacman -S --needed --noconfirm neovim
 else
-  log "instalando neovim $NVIM_VERSION (atual: ${current:-nenhum})"
-  tarball="nvim-linux-x86_64.tar.gz"
+  # Debian/Ubuntu ship an old Neovim (and the PPA ships -dev builds), so use the
+  # upstream tarball pinned to $NVIM_VERSION.
+  pkg_installed neovim && {
+    warn "existe um neovim via apt que vai conflitar com o de /opt"
+    todo+=("sudo apt remove neovim neovim-runtime   # remove o duplicado do apt")
+  }
+  log "instalando neovim $NVIM_VERSION em /opt (atual: ${sys_minor:+0.$sys_minor}${sys_minor:-nenhum})"
   tmp="$(mktemp -d)"
-  run curl -fsSL -o "$tmp/$tarball" \
-    "https://github.com/neovim/neovim/releases/download/$NVIM_VERSION/$tarball"
+  run curl -fsSL -o "$tmp/nvim.tar.gz" \
+    "https://github.com/neovim/neovim/releases/download/$NVIM_VERSION/nvim-linux-x86_64.tar.gz"
   run sudo rm -rf /opt/nvim-linux-x86_64
-  run sudo tar -C /opt -xzf "$tmp/$tarball"
+  run sudo tar -C /opt -xzf "$tmp/nvim.tar.gz"
   run sudo ln -sf /opt/nvim-linux-x86_64/bin/nvim /usr/local/bin/nvim
   rm -rf "$tmp"
 fi
@@ -78,9 +131,6 @@ fi
 # Every Node-based LSP (ts_ls, eslint, jsonls, html, cssls, tailwindcss, bashls,
 # yamlls, dockerls) needs a real node binary on PATH. If node/npm are lazy nvm shell
 # functions they do not exist for Neovim, which spawns servers directly.
-# Prefer the newest nvm install over a distro node: Ubuntu ships Node 18, which is
-# too old for several Mason tools (markdownlint-cli2 crashes on it).
-NODE_MIN_MAJOR=20
 node_major() { "$1/node" --version 2>/dev/null | sed 's/^v//; s/\..*//'; }
 
 node_bin=""
@@ -92,50 +142,54 @@ if [ -z "$node_bin" ] && command -v node >/dev/null; then
 fi
 if [ -n "$node_bin" ]; then
   have="$(node_major "$node_bin")"
-  if [ -z "$have" ] || [ "$have" -lt "$NODE_MIN_MAJOR" ]; then
-    warn "node encontrado em $node_bin e v${have:-?}, abaixo do minimo v$NODE_MIN_MAJOR"
+  if [ -z "$have" ] || [ "$have" -lt "$NODE_MIN_MAJOR" ] 2>/dev/null; then
+    warn "node em $node_bin e v${have:-?}, abaixo do minimo v$NODE_MIN_MAJOR"
     node_bin=""
   fi
 fi
 
 if [ -z "$node_bin" ]; then
-  warn "nenhum node utilizavel encontrado."
-  todo+=("instale o Node >= $NODE_MIN_MAJOR (nvm: https://github.com/nvm-sh/nvm) e rode este script de novo")
+  warn "nenhum node utilizavel encontrado"
+  case "$DISTRO" in
+    arch) todo+=("sudo pacman -S nodejs npm    # ou 'nvm install --lts', depois rode este script de novo") ;;
+    *)    todo+=("instale o Node >= $NODE_MIN_MAJOR (nvm install --lts) e rode este script de novo") ;;
+  esac
+elif [ "$node_bin" = /usr/bin ] || [ "$node_bin" = /usr/local/bin ]; then
+  # A distro node already on the default PATH needs no .zshenv entry.
+  skip "node do sistema (v$(node_major "$node_bin")) ja no PATH"
 elif grep -qs 'versions/node' "$HOME/.zshenv" 2>/dev/null; then
   skip "node no PATH via ~/.zshenv"
 else
   log "adicionando node ao PATH em ~/.zshenv ($node_bin)"
-  if [ "$CHECK_ONLY" = 0 ]; then
-    cat >> "$HOME/.zshenv" <<EOF
+  [ "$CHECK_ONLY" = 0 ] && cat >> "$HOME/.zshenv" <<EOF
 
 # nvm define node/npm como funcoes lazy no .zshrc, que nao existem em shells
 # nao-interativos. Sem isto nenhum LSP baseado em Node inicia dentro do Neovim.
 export PATH="$node_bin:\$PATH"
 EOF
-  fi
 fi
 
 # --------------------------------------------------------------------------- repo
 if [ -d "$CONFIG_DIR/.git" ]; then
   skip "config em $CONFIG_DIR"
 elif [ -e "$CONFIG_DIR" ]; then
-  warn "$CONFIG_DIR existe mas nao e um repo git; nao vou mexer."
+  warn "$CONFIG_DIR existe e nao e um repo git; nao vou mexer"
   todo+=("mova ou remova $CONFIG_DIR e rode este script de novo")
 else
   log "clonando config em $CONFIG_DIR"
   run git clone "$REPO_URL" "$CONFIG_DIR"
 fi
 
-# --------------------------------------------------------------------------- kitty
+# ------------------------------------------------------------------------ terminal
+# smart-splits can only cross pane boundaries on kitty, wezterm, tmux and zellij.
+# Omarchy's default terminal is neither, so there the <C-hjkl> keys stay Neovim-only.
 KITTY_CONF="$HOME/.config/kitty/kitty.conf"
-if [ ! -f "$KITTY_CONF" ]; then
-  log "kitty.conf nao existe; pulando integracao smart-splits"
-elif grep -q "IS_NVIM" "$KITTY_CONF"; then
-  skip "mapeamentos smart-splits no kitty.conf"
-else
-  log "adicionando mapeamentos smart-splits ao kitty.conf"
-  if [ "$CHECK_ONLY" = 0 ]; then
-    cat >> "$KITTY_CONF" <<'EOF'
+if [ -f "$KITTY_CONF" ]; then
+  if grep -q "IS_NVIM" "$KITTY_CONF"; then
+    skip "mapeamentos smart-splits no kitty.conf"
+  else
+    log "adicionando mapeamentos smart-splits ao kitty.conf"
+    [ "$CHECK_ONLY" = 0 ] && cat >> "$KITTY_CONF" <<'EOF'
 
 # --- smart-splits.nvim: <C-hjkl> navega entre panes do kitty E splits do Neovim ---
 map ctrl+h neighboring_window left
@@ -161,8 +215,13 @@ map --when-focus-on var:IS_NVIM alt+l
 allow_remote_control yes
 listen_on unix:@mykitty
 EOF
+    todo+=("reinicie o kitty por completo (allow_remote_control/listen_on so valem em instancias novas)")
   fi
-  todo+=("reinicie o kitty por completo (allow_remote_control/listen_on so valem em instancias novas)")
+elif command -v tmux >/dev/null; then
+  log "sem kitty; tmux detectado -- smart-splits funciona nele sem config extra do lado do terminal"
+else
+  log "sem kitty/tmux -- <C-hjkl> navega apenas entre splits do Neovim"
+  log "  (smart-splits so cruza panes em kitty, wezterm, tmux e zellij)"
 fi
 
 # ----------------------------------------------------------------- plugins + mason
@@ -176,34 +235,34 @@ else
   NVIM_APPNAME="$APPNAME" nvim --headless \
     -c 'lua require("mason-lspconfig.features.ensure_installed")()' \
     -c 'lua vim.wait(600000, function()
-          local r = require("mason-registry")
-          for _, p in ipairs(r.get_all_packages()) do
+          for _, p in ipairs(require("mason-registry").get_all_packages()) do
             if p:is_installing() then return false end
           end
-          return not require("mason-registry.installer").is_installing()
+          return true
         end, 2000)' -c qa 2>&1 | tail -3 || true
 fi
 
 # --------------------------------------------------------------------------- shell
-if grep -qs "NVIM_APPNAME" "$HOME/.zshrc" 2>/dev/null; then
-  skip "NVIM_APPNAME no .zshrc"
-else
-  todo+=("export NVIM_APPNAME=\"$APPNAME\"   # adicione ao ~/.zshrc para 'nvim' usar este perfil")
-fi
+grep -qs "NVIM_APPNAME" "$HOME/.zshrc" 2>/dev/null \
+  && skip "NVIM_APPNAME no .zshrc" \
+  || todo+=("export NVIM_APPNAME=\"$APPNAME\"   # adicione ao ~/.zshrc para 'nvim' usar este perfil")
 
 command -v gh >/dev/null && gh auth status >/dev/null 2>&1 \
   && skip "gh autenticado" \
   || todo+=("gh auth login    # necessario para o octo.nvim (PRs/issues)")
 
-# --------------------------------------------------------------------------- fim
+command -v "$CLIP_BIN" >/dev/null || todo+=("instale $CLIP_BIN para o clipboard do sistema")
+
+# ----------------------------------------------------------------------------- fim
 echo
 log "resumo:"
+printf '  distro    : %s (%s)\n' "${PRETTY_NAME:-?}" "$DISTRO"
 printf '  nvim      : %s\n' "$(nvim --version 2>/dev/null | head -1 || echo 'nao encontrado')"
 printf '  config    : %s\n' "$CONFIG_DIR"
 printf '  node      : %s\n' "${node_bin:-NAO ENCONTRADO}${node_bin:+ (v$(node_major "$node_bin"))}"
+printf '  clipboard : %s\n' "$(command -v "$CLIP_BIN" >/dev/null && echo "$CLIP_BIN" || echo "$CLIP_BIN FALTANDO")"
 if [ ${#todo[@]} -gt 0 ]; then
-  echo
-  log "passos manuais restantes:"
+  echo; log "passos manuais restantes:"
   for t in "${todo[@]}"; do printf '  - %s\n' "$t"; done
 fi
 echo
