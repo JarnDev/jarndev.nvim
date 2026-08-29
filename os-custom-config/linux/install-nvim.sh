@@ -217,10 +217,44 @@ listen_on unix:@mykitty
 EOF
     todo+=("reinicie o kitty por completo (allow_remote_control/listen_on so valem em instancias novas)")
   fi
-elif command -v tmux >/dev/null; then
-  log "sem kitty; tmux detectado -- smart-splits funciona nele sem config extra do lado do terminal"
-else
-  log "sem kitty/tmux -- <C-hjkl> navega apenas entre splits do Neovim"
+fi
+
+# tmux is the portable fallback -- it also needs bindings on its own side, and it is
+# what Omarchy offers (Super+Alt+Return), since Ghostty/Alacritty/Foot have no
+# multiplexer integration in smart-splits.
+if command -v tmux >/dev/null; then
+  TMUX_CONF="$HOME/.config/tmux/tmux.conf"
+  [ -f "$HOME/.tmux.conf" ] && TMUX_CONF="$HOME/.tmux.conf"
+  if [ -f "$TMUX_CONF" ] && grep -q "pane-is-vim" "$TMUX_CONF"; then
+    skip "bindings smart-splits no $(basename "$TMUX_CONF")"
+  else
+    log "adicionando bindings smart-splits em $TMUX_CONF"
+    if [ "$CHECK_ONLY" = 0 ]; then
+      mkdir -p "$(dirname "$TMUX_CONF")"
+      cat >> "$TMUX_CONF" <<'EOF'
+
+# --- smart-splits.nvim: <C-hjkl> navega entre panes do tmux E splits do Neovim ---
+# '@pane-is-vim' e setado pelo plugin ao carregar (por isso ele nao e lazy-loaded).
+bind-key -n C-h if -F "#{@pane-is-vim}" 'send-keys C-h' 'select-pane -L'
+bind-key -n C-j if -F "#{@pane-is-vim}" 'send-keys C-j' 'select-pane -D'
+bind-key -n C-k if -F "#{@pane-is-vim}" 'send-keys C-k' 'select-pane -U'
+bind-key -n C-l if -F "#{@pane-is-vim}" 'send-keys C-l' 'select-pane -R'
+
+bind-key -n M-h if -F "#{@pane-is-vim}" 'send-keys M-h' 'resize-pane -L 3'
+bind-key -n M-j if -F "#{@pane-is-vim}" 'send-keys M-j' 'resize-pane -D 3'
+bind-key -n M-k if -F "#{@pane-is-vim}" 'send-keys M-k' 'resize-pane -U 3'
+bind-key -n M-l if -F "#{@pane-is-vim}" 'send-keys M-l' 'resize-pane -R 3'
+
+bind-key -T copy-mode-vi 'C-h' select-pane -L
+bind-key -T copy-mode-vi 'C-j' select-pane -D
+bind-key -T copy-mode-vi 'C-k' select-pane -U
+bind-key -T copy-mode-vi 'C-l' select-pane -R
+EOF
+    fi
+    todo+=("recarregue o tmux:  tmux source-file $TMUX_CONF")
+  fi
+elif [ ! -f "$KITTY_CONF" ]; then
+  log "sem kitty nem tmux -- <C-hjkl> navega apenas entre splits do Neovim"
   log "  (smart-splits so cruza panes em kitty, wezterm, tmux e zellij)"
 fi
 
@@ -243,9 +277,17 @@ else
 fi
 
 # --------------------------------------------------------------------------- shell
-grep -qs "NVIM_APPNAME" "$HOME/.zshrc" 2>/dev/null \
-  && skip "NVIM_APPNAME no .zshrc" \
-  || todo+=("export NVIM_APPNAME=\"$APPNAME\"   # adicione ao ~/.zshrc para 'nvim' usar este perfil")
+if grep -qs "NVIM_APPNAME" "$HOME/.zshrc" 2>/dev/null; then
+  skip "NVIM_APPNAME no .zshrc"
+elif [ -d "$HOME/.config/nvim" ]; then
+  # Omarchy ships its own Neovim config (LazyVim) at ~/.config/nvim, and its `n` alias
+  # plus the Setup > Configs menu both target it. A global export would hijack all of
+  # that, so alias this profile instead of making it the default.
+  log "ja existe outra config em ~/.config/nvim -- nao torne esta a padrao globalmente"
+  todo+=("alias jn='NVIM_APPNAME=$APPNAME nvim'   # ~/.zshrc: mantem a config existente intacta")
+else
+  todo+=("export NVIM_APPNAME=\"$APPNAME\"   # adicione ao ~/.zshrc para 'nvim' usar este perfil")
+fi
 
 command -v gh >/dev/null && gh auth status >/dev/null 2>&1 \
   && skip "gh autenticado" \
