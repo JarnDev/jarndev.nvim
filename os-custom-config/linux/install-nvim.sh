@@ -331,11 +331,19 @@ bind-key -T copy-mode-vi 'C-k' select-pane -U
 bind-key -T copy-mode-vi 'C-l' select-pane -R
 EOF
     fi
-    todo+=("recarregue o tmux:  tmux source-file $TMUX_CONF")
   fi
 elif ! command -v kitty >/dev/null; then
   log "sem kitty nem tmux -- <C-hjkl> navega apenas entre splits do Neovim"
   log "  (smart-splits so cruza panes em kitty, wezterm, tmux e zellij)"
+fi
+
+# A tmux server started before the bindings were written keeps running without them, and
+# the reminder above is only emitted on the run that writes the file. On a re-run the file
+# reads "ja ok" while `tmux list-keys` still shows nothing -- so ask the live server.
+if command -v tmux >/dev/null && tmux list-sessions >/dev/null 2>&1; then
+  if [ "$(tmux list-keys 2>/dev/null | grep -c 'pane-is-vim')" = 0 ]; then
+    todo+=("recarregue o tmux (a sessao viva ainda nao tem os bindings):  tmux source-file ${TMUX_CONF:-~/.config/tmux/tmux.conf}")
+  fi
 fi
 
 # Some distros (Omarchy) generate and version the terminal/tmux configs themselves, so
@@ -346,11 +354,17 @@ fi
 
 # ----------------------------------------------------------------- plugins + mason
 if [ "$CHECK_ONLY" = 1 ]; then
-  log "would run: lazy sync + mason install (headless)"
+  log "would run: lazy install + restore + mason install (headless)"
 else
   log "instalando plugins (lazy) -- pode demorar alguns minutos"
   [ -n "$node_bin" ] && export PATH="$node_bin:$PATH"
-  NVIM_APPNAME="$APPNAME" nvim --headless "+Lazy! sync" +qa 2>&1 | tail -3 || true
+  # install + restore, never sync. `sync` updates every plugin to its latest commit and
+  # rewrites lazy-lock.json, which leaves a just-cloned repo with a dirty tracked file --
+  # and the user's next `git pull` then fails outright under pull.rebase=true. `restore`
+  # checks out exactly the commits in the lockfile, which is the entire reason it is
+  # committed: the same plugin versions on every machine, and a clean working tree.
+  NVIM_APPNAME="$APPNAME" nvim --headless "+Lazy! install" +qa 2>&1 | tail -3 || true
+  NVIM_APPNAME="$APPNAME" nvim --headless "+Lazy! restore" +qa 2>&1 | tail -3 || true
   log "instalando servidores LSP e ferramentas (mason)"
   NVIM_APPNAME="$APPNAME" nvim --headless \
     -c 'lua require("mason-lspconfig.features.ensure_installed")()' \
