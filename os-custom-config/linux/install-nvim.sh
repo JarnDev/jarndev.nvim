@@ -51,12 +51,16 @@ fi
 [ "$DISTRO" = unknown ] && command -v apt-get >/dev/null && DISTRO=debian
 log "distro detectada: ${PRETTY_NAME:-desconhecida}  ->  familia: $DISTRO"
 
-# Which rc file to write PATH into. Omarchy defaults to bash and has no zsh at all,
-# so targeting ~/.zshenv there would create an orphan file, report success, and leave
-# the PATH unset -- the exact failure this step exists to prevent.
+# Which rc file to write PATH into. SHELL_ENV must be a file read by EVERY invocation
+# of the shell, including non-interactive ones -- that is where the LSPs live. Only zsh
+# has such a file. SHELL_RC is the interactive rc, used for aliases only.
 case "$(basename "${SHELL:-sh}")" in
   zsh)  SHELL_ENV="$HOME/.zshenv"; SHELL_RC="$HOME/.zshrc" ;;
-  bash) SHELL_ENV="$HOME/.bashrc"; SHELL_RC="$HOME/.bashrc" ;;
+  # bash has no ~/.zshenv equivalent. ~/.bashrc is not read by non-interactive shells,
+  # and distro rc files (Omarchy's) `return` for them within the first few lines anyway,
+  # so an appended export is dead code exactly where it is needed. Leave SHELL_ENV empty
+  # and let the node step hand the user precise instructions instead.
+  bash) SHELL_ENV="";              SHELL_RC="$HOME/.bashrc" ;;
   *)    SHELL_ENV="";              SHELL_RC="" ;;   # fish/nu: different export syntax
 esac
 
@@ -77,8 +81,8 @@ pkg_installed() {
 }
 
 case "$DISTRO" in
-  debian) PKGS=(git make unzip curl gcc g++ gdb ripgrep fd-find python3-venv "$CLIP_PKG_debian") ;;
-  arch)   PKGS=(git base-devel unzip curl gdb ripgrep fd python "$CLIP_PKG_arch") ;;
+  debian) PKGS=(git make unzip curl gcc g++ gdb ripgrep fd-find python3-venv chafa "$CLIP_PKG_debian") ;;
+  arch)   PKGS=(git base-devel unzip curl gdb ripgrep fd python chafa "$CLIP_PKG_arch") ;;
   *)      PKGS=() ;;
 esac
 
@@ -139,55 +143,82 @@ fi
 
 # --------------------------------------------------------------------------- node
 # Every Node-based LSP (ts_ls, eslint, jsonls, html, cssls, tailwindcss, bashls,
-# yamlls, dockerls) needs a real node binary on PATH. If node/npm are lazy nvm shell
-# functions they do not exist for Neovim, which spawns servers directly.
-node_major() { "$1/node" --version 2>/dev/null | sed 's/^v//; s/\..*//'; }
+# yamlls, dockerls) needs a real node binary on PATH. Neovim execs those servers
+# directly, inheriting the PATH of whatever launched it.
+NODE_MAJOR_OF() { "$1" --version 2>/dev/null | sed 's/^v//; s/\..*//'; }
+
+# The question worth asking is not "which rc file mentions node" but "will Neovim
+# actually find node". Answer it empirically, in a *clean login shell*: that is what a
+# fresh terminal or a desktop entry gets, and unlike a bare `bash -c` it does not
+# inherit whatever this script's own shell happens to have loaded.
+node_from_login_shell() {
+  local sh out
+  sh="$(command -v "$(basename "${SHELL:-sh}")" 2>/dev/null)" || return 1
+  [ -x "$sh" ] || return 1
+  # timeout: a broken or interactive-assuming rc must not hang the installer.
+  out="$(timeout 10 env -i HOME="$HOME" TERM=dumb "$sh" -lc 'command -v node' 2>/dev/null | tail -1)"
+  # A version manager's shell *function* prints a bare name, not a path. That is the
+  # exact nvm failure this step exists for, so it must not count as success.
+  case "$out" in /*) [ -x "$out" ] && printf '%s\n' "$out" ;; esac
+}
 
 node_bin=""
-# mise (Omarchy's default version manager) exposes version-agnostic shims. Point at
-# those, never at .../installs/node/<version>/bin -- that pins the version and breaks
-# on the next `mise up node`.
-if [ -x "$HOME/.local/share/mise/shims/node" ]; then
-  node_bin="$HOME/.local/share/mise/shims"
-elif [ -d "$HOME/.nvm/versions/node" ]; then
-  node_bin="$(find "$HOME/.nvm/versions/node" -maxdepth 2 -type d -name bin 2>/dev/null | sort -V | tail -1)"
-fi
-if [ -z "$node_bin" ] && command -v node >/dev/null; then
-  node_bin="$(dirname "$(readlink -f "$(command -v node)")")"
-fi
-if [ -n "$node_bin" ]; then
-  have="$(node_major "$node_bin")"
-  if [ -z "$have" ] || [ "$have" -lt "$NODE_MIN_MAJOR" ] 2>/dev/null; then
-    warn "node em $node_bin e v${have:-?}, abaixo do minimo v$NODE_MIN_MAJOR"
-    node_bin=""
-  fi
-fi
-
-if [ -z "$node_bin" ]; then
-  warn "nenhum node utilizavel encontrado"
-  case "$DISTRO" in
-    arch) todo+=("sudo pacman -S nodejs npm    # ou 'nvm install --lts', depois rode este script de novo") ;;
-    *)    todo+=("instale o Node >= $NODE_MIN_MAJOR (nvm install --lts) e rode este script de novo") ;;
-  esac
-elif [ "$node_bin" = /usr/bin ] || [ "$node_bin" = /usr/local/bin ]; then
-  # A distro node already on the default PATH needs no rc entry.
-  skip "node do sistema (v$(node_major "$node_bin")) ja no PATH"
-elif [ -z "$SHELL_ENV" ]; then
-  warn "shell $(basename "${SHELL:-?}") nao suportado para edicao automatica de PATH"
-  todo+=("adicione ao rc do seu shell:  PATH=\"$node_bin:\$PATH\"")
-elif grep -qs "$node_bin" "$SHELL_ENV" 2>/dev/null; then
-  skip "node no PATH via $(basename "$SHELL_ENV")"
+login_node="$(node_from_login_shell || true)"
+if [ -n "$login_node" ] && [ "$(NODE_MAJOR_OF "$login_node")" -ge "$NODE_MIN_MAJOR" ] 2>/dev/null; then
+  # Already reachable -- via a distro default, mise shims exported by the distro's own
+  # env bootstrap (Omarchy), or a previous run of this script. Writing a PATH export on
+  # top of this would pin a version that a `mise up node` then invalidates.
+  node_bin="$(dirname "$login_node")"
+  skip "node v$(NODE_MAJOR_OF "$login_node") ja visivel para o Neovim ($node_bin)"
 else
-  log "adicionando node ao PATH em $SHELL_ENV ($node_bin)"
-  [ "$CHECK_ONLY" = 0 ] && cat >> "$SHELL_ENV" <<EOF
+  # Not reachable: find one to point at. Prefer version-agnostic shims over any path
+  # containing a version number.
+  if [ -x "$HOME/.local/share/mise/shims/node" ]; then
+    node_bin="$HOME/.local/share/mise/shims"
+  elif [ -d "$HOME/.nvm/versions/node" ]; then
+    node_bin="$(find "$HOME/.nvm/versions/node" -maxdepth 2 -type d -name bin 2>/dev/null | sort -V | tail -1)"
+  elif command -v node >/dev/null; then
+    node_bin="$(dirname "$(readlink -f "$(command -v node)")")"
+  fi
+  if [ -n "$node_bin" ]; then
+    have="$(NODE_MAJOR_OF "$node_bin/node")"
+    if [ -z "$have" ] || [ "$have" -lt "$NODE_MIN_MAJOR" ] 2>/dev/null; then
+      warn "node em $node_bin e v${have:-?}, abaixo do minimo v$NODE_MIN_MAJOR"
+      node_bin=""
+    fi
+  fi
+
+  if [ -z "$node_bin" ]; then
+    warn "nenhum node utilizavel encontrado"
+    case "$DISTRO" in
+      arch) todo+=("sudo pacman -S nodejs npm    # ou 'mise use -g node@lts', depois rode este script de novo") ;;
+      *)    todo+=("instale o Node >= $NODE_MIN_MAJOR (nvm install --lts) e rode este script de novo") ;;
+    esac
+  elif [ -n "$SHELL_ENV" ]; then
+    if grep -qs "$node_bin" "$SHELL_ENV" 2>/dev/null; then
+      # Present in the file yet the login shell could not resolve it: do not append a
+      # duplicate, the problem is elsewhere (ordering, or an rc that overrides PATH).
+      warn "$SHELL_ENV ja cita $node_bin mas o login shell nao acha node -- verifique a ordem no arquivo"
+    else
+      log "adicionando node ao PATH em $SHELL_ENV ($node_bin)"
+      [ "$CHECK_ONLY" = 0 ] && cat >> "$SHELL_ENV" <<EOF
 
 # Gerenciadores de versao (nvm/mise) expoem node/npm como funcoes ou shims que nao
 # existem em shells nao-interativos. Sem isto nenhum LSP baseado em Node inicia
 # dentro do Neovim, que executa os servidores diretamente.
 export PATH="$node_bin:\$PATH"
 EOF
+    fi
+  else
+    # bash and friends: there is no file with ~/.zshenv semantics, and appending to
+    # ~/.bashrc is worse than useless -- distro rc files (Omarchy's is one) return early
+    # for non-interactive shells within the first few lines, so an appended export is
+    # dead code precisely for the shells the LSPs run in. Hand this to the user with the
+    # trap spelled out rather than writing something that silently does nothing.
+    warn "node em $node_bin nao esta visivel para shells nao-interativos"
+    todo+=("exporte PATH=\"$node_bin:\$PATH\" num arquivo lido incondicionalmente (~/.profile, ou ACIMA do 'return' de nao-interativo no ~/.bashrc) -- acrescentar no FIM do ~/.bashrc nao funciona")
+  fi
 fi
-
 # --------------------------------------------------------------------------- repo
 if [ -d "$CONFIG_DIR/.git" ]; then
   skip "config em $CONFIG_DIR"
@@ -324,13 +355,18 @@ command -v gh >/dev/null && gh auth status >/dev/null 2>&1 \
 
 command -v "$CLIP_BIN" >/dev/null || todo+=("instale $CLIP_BIN para o clipboard do sistema")
 
+# Optional: used by one feature each, so they are reported rather than installed.
+PKG_INSTALL="sudo apt-get install -y"; [ "$DISTRO" = arch ] && PKG_INSTALL="sudo pacman -S"
+command -v cmake >/dev/null || todo+=("$PKG_INSTALL cmake    # projetos C/C++ com compile_commands.json (clangd)")
+command -v mpv   >/dev/null || todo+=("$PKG_INSTALL mpv      # reproducao de video (<leader>rv)")
+
 # ----------------------------------------------------------------------------- fim
 echo
 log "resumo:"
 printf '  distro    : %s (%s)\n' "${PRETTY_NAME:-?}" "$DISTRO"
 printf '  nvim      : %s\n' "$(nvim --version 2>/dev/null | head -1 || echo 'nao encontrado')"
 printf '  config    : %s\n' "$CONFIG_DIR"
-printf '  node      : %s\n' "${node_bin:-NAO ENCONTRADO}${node_bin:+ (v$(node_major "$node_bin"))}"
+printf '  node      : %s\n' "${node_bin:-NAO ENCONTRADO}${node_bin:+ (v$(NODE_MAJOR_OF "$node_bin/node"))}"
 printf '  clipboard : %s\n' "$(command -v "$CLIP_BIN" >/dev/null && echo "$CLIP_BIN" || echo "$CLIP_BIN FALTANDO")"
 if [ ${#todo[@]} -gt 0 ]; then
   echo; log "passos manuais restantes:"
