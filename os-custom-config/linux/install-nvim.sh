@@ -33,6 +33,14 @@ run() {
   if [ "$CHECK_ONLY" = 1 ]; then printf '[nvim-setup] would run: %s\n' "$*"; return 0; fi
   "$@"
 }
+# Steps whose whole effect is a guarded heredoc never pass through run(), so under
+# --check they would announce themselves in the affirmative with nothing marking them
+# as hypothetical -- output that reads as if the file had already been written. Route
+# every appending step through this so it is as unambiguous as a `would run:` line.
+log_write() {   # $1 = what is being written, $2 = target file
+  if [ "$CHECK_ONLY" = 1 ]; then printf '[nvim-setup] would append: %s -> %s\n' "$1" "$2"
+  else log "escrevendo $1 em $2"; fi
+}
 
 # ------------------------------------------------------------------- distro/session
 DISTRO=unknown
@@ -200,7 +208,7 @@ else
       # duplicate, the problem is elsewhere (ordering, or an rc that overrides PATH).
       warn "$SHELL_ENV ja cita $node_bin mas o login shell nao acha node -- verifique a ordem no arquivo"
     else
-      log "adicionando node ao PATH em $SHELL_ENV ($node_bin)"
+      log_write "node no PATH ($node_bin)" "$SHELL_ENV"
       [ "$CHECK_ONLY" = 0 ] && cat >> "$SHELL_ENV" <<EOF
 
 # Gerenciadores de versao (nvm/mise) expoem node/npm como funcoes ou shims que nao
@@ -242,7 +250,7 @@ if command -v kitty >/dev/null && [ -f "$KITTY_CONF" ]; then
   if grep -q "IS_NVIM" "$KITTY_CONF"; then
     skip "mapeamentos smart-splits no kitty.conf"
   else
-    log "adicionando mapeamentos smart-splits ao kitty.conf"
+    log_write "mapeamentos smart-splits do kitty" "$KITTY_CONF"
     [ "$CHECK_ONLY" = 0 ] && cat >> "$KITTY_CONF" <<'EOF'
 
 # --- smart-splits.nvim: <C-hjkl> navega entre panes do kitty E splits do Neovim ---
@@ -282,7 +290,7 @@ if command -v tmux >/dev/null; then
   if [ -f "$TMUX_CONF" ] && grep -q "pane-is-vim" "$TMUX_CONF"; then
     skip "bindings smart-splits no $(basename "$TMUX_CONF")"
   else
-    log "adicionando bindings smart-splits em $TMUX_CONF"
+    log_write "bindings smart-splits do tmux" "$TMUX_CONF"
     if [ "$CHECK_ONLY" = 0 ]; then
       mkdir -p "$(dirname "$TMUX_CONF")"
       cat >> "$TMUX_CONF" <<'EOF'
