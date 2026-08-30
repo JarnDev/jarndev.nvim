@@ -9,6 +9,27 @@ if not vim.uv.fs_stat(lazypath) then
     '--branch=stable',
     lazypath,
   }
+  -- lazy.nvim is listed in lazy-lock.json, but `:Lazy restore` cannot restore the manager
+  -- it is currently running from. A fresh clone therefore lands on whatever `stable` points
+  -- at today, which leaves the committed lockfile dirty on a brand new install -- and the
+  -- user's first `git pull` then fails under pull.rebase=true. Pin it here instead, before
+  -- anything is loaded, so the lockfile means the same thing for the manager as for the 77
+  -- plugins it manages.
+  local lock = io.open(vim.fn.stdpath 'config' .. '/lazy-lock.json', 'r')
+  if lock then
+    local raw = lock:read '*a'
+    lock:close()
+    local ok, pinned = pcall(vim.json.decode, raw)
+    local commit = ok and type(pinned) == 'table' and pinned['lazy.nvim'] and pinned['lazy.nvim'].commit
+    if commit then
+      vim.fn.system { 'git', '-C', lazypath, 'checkout', '--quiet', commit }
+      if vim.v.shell_error ~= 0 then
+        -- --branch=stable does not guarantee the locked commit is present locally.
+        vim.fn.system { 'git', '-C', lazypath, 'fetch', '--quiet', 'origin', commit }
+        vim.fn.system { 'git', '-C', lazypath, 'checkout', '--quiet', commit }
+      end
+    end
+  end
 end
 vim.opt.rtp:prepend(lazypath)
 
