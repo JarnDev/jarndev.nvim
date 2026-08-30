@@ -23,5 +23,10 @@ return {
     require('tokyonight').setup(opts)
     vim.cmd.colorscheme 'tokyonight-night'
     vim.cmd.hi 'Comment gui=none'
+    -- chafa renders the dashboard logo with `--colors none`, so the art carries no
+    -- colour of its own and takes whatever SnacksDashboardHeader is. tokyonight derives
+    -- that group from c.cyan, which the brand palette above sets to #22d3ee -- so the
+    -- logo came out cyan. Paint it in the foreground colour instead.
+    vim.cmd.hi 'SnacksDashboardHeader guifg=#f4f6fb'
   end,
 }
