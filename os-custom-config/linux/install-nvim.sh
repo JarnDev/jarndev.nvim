@@ -103,10 +103,28 @@ else
     skip "pacotes do sistema"
   else
     log "instalando: ${missing[*]}"
-    case "$DISTRO" in
-      debian) run sudo apt-get update -qq && run sudo apt-get install -y "${missing[@]}" ;;
-      arch)   run sudo pacman -S --needed --noconfirm "${missing[@]}" ;;
-    esac
+    # sudo needs a tty to prompt. Without one -- an automated context, or a session
+    # with no terminal -- the install below fails and `set -e` kills the whole script
+    # right after announcing the step, which reads as a crash rather than a missing
+    # credential. Say what is wrong and how to get past it before that happens.
+    if ! sudo -n true 2>/dev/null; then
+      if [ ! -t 0 ]; then
+        warn "sudo pediria senha e nao ha terminal para digita-la"
+        warn "autentique antes (sudo -v) ou instale manualmente: ${missing[*]}"
+        todo+=("instale os pacotes e rode este script de novo: ${missing[*]}")
+        missing=()
+      else
+        log "sudo vai pedir sua senha para instalar os pacotes"
+      fi
+    fi
+    # Guard with if/fi, not `[ ... ] &&`: a false test as the last command of the case
+    # makes the whole compound return 1, which `set -e` turns into an abort.
+    if [ ${#missing[@]} -gt 0 ]; then
+      case "$DISTRO" in
+        debian) run sudo apt-get update -qq && run sudo apt-get install -y "${missing[@]}" ;;
+        arch)   run sudo pacman -S --needed --noconfirm "${missing[@]}" ;;
+      esac
+    fi
   fi
 fi
 
