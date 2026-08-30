@@ -20,8 +20,12 @@ NVIM_VERSION="${NVIM_VERSION:-v0.12.5}"   # used only when we have to install it
 NVIM_MIN_MINOR=11                          # config needs >= 0.11 (vim.lsp.config, vim.hl)
 NODE_MIN_MAJOR=20
 REPO_URL="${REPO_URL:-https://github.com/JarnDev/jarndev.nvim.git}"
-CONFIG_DIR="${CONFIG_DIR:-$HOME/.config/jarndev.nvim}"
 APPNAME="jarndev.nvim"
+# Neovim resolves this profile as $XDG_CONFIG_HOME/$NVIM_APPNAME, so CONFIG_DIR has to be
+# derived from the same two values -- otherwise an overridden CONFIG_DIR clones to one
+# directory while every headless nvim below reads another. Overriding XDG_CONFIG_HOME and
+# XDG_DATA_HOME together is what makes an isolated test install possible.
+CONFIG_DIR="${CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/$APPNAME}"
 CHECK_ONLY=0
 [ "${1:-}" = "--check" ] && CHECK_ONLY=1
 
@@ -342,7 +346,7 @@ fi
 # reads "ja ok" while `tmux list-keys` still shows nothing -- so ask the live server.
 if command -v tmux >/dev/null && tmux list-sessions >/dev/null 2>&1; then
   if [ "$(tmux list-keys 2>/dev/null | grep -c 'pane-is-vim')" = 0 ]; then
-    todo+=("recarregue o tmux (a sessao viva ainda nao tem os bindings):  tmux source-file ${TMUX_CONF:-~/.config/tmux/tmux.conf}")
+    todo+=("recarregue o tmux (a sessao viva ainda nao tem os bindings):  tmux source-file ${TMUX_CONF:-$HOME/.config/tmux/tmux.conf}")
   fi
 fi
 
