@@ -211,7 +211,10 @@ else
     node_bin="$(dirname "$(readlink -f "$(command -v node)")")"
   fi
   if [ -n "$node_bin" ]; then
-    have="$(NODE_MAJOR_OF "$node_bin/node")"
+    # `|| true`: NODE_MAJOR_OF is a pipeline, so under `set -o pipefail` a missing or
+    # broken node makes the assignment itself fail and `set -e` aborts here -- before the
+    # empty check on the next line, which exists for exactly that case.
+    have="$(NODE_MAJOR_OF "$node_bin/node" || true)"
     if [ -z "$have" ] || [ "$have" -lt "$NODE_MIN_MAJOR" ] 2>/dev/null; then
       warn "node em $node_bin e v${have:-?}, abaixo do minimo v$NODE_MIN_MAJOR"
       node_bin=""
