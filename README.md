@@ -189,6 +189,9 @@ live; `<leader>sk` searches every mapping. `<leader>?` opens a Vim key reference
 
 ## Plugins
 
+[`docs/PLUGINS.md`](docs/PLUGINS.md) explains what each non-Kickstart plugin is for,
+why it was chosen and how to use it. The table below is the inventory.
+
 | Category | Plugins |
 | --- | --- |
 | **Core** | lazy.nvim, snacks.nvim (picker, dashboard, terminal, lazygit, indent, notifier, scroll, words, image) |
@@ -196,17 +199,19 @@ live; `<leader>sk` searches every mapping. `<leader>?` opens a Vim key reference
 | **Completion** | blink.cmp (LSP, snippets, path, buffer, copilot, minuet, dadbod), LuaSnip |
 | **Treesitter** | nvim-treesitter (`main`), textobjects, context, autotag |
 | **Editing** | mini.ai / surround / move / hipatterns, yanky, dial, autopairs, flash, ts-comments, vim-sleuth |
+| **Markdown** | render-markdown.nvim, markdown-preview.nvim |
+| **Session** | auto-session |
 | **Navigation** | harpoon2, smart-splits, window-picker, oil.nvim, neo-tree, bufferline |
 | **Refactor** | refactoring.nvim, inc-rename, neogen, grug-far |
 | **Git** | gitsigns, diffview, octo |
-| **Test / Debug** | neotest (python, jest), nvim-dap + dap-ui + virtual-text, codelldb, debugpy, js-debug |
+| **Test / Debug** | neotest (python, jest), nvim-dap + dap-ui + virtual-text + mason-nvim-dap, codelldb, debugpy, js-debug |
 | **Tasks** | overseer.nvim |
 | **Formatting** | conform.nvim — stylua, prettierd, ruff, clang-format, cmake-format |
 | **Linting** | nvim-lint — ruff, eslint_d, markdownlint-cli2, shellcheck |
 | **Database** | vim-dadbod + dadbod-ui + dadbod-completion |
 | **HTTP** | kulala.nvim |
 | **AI** | claudecode.nvim, codecompanion.nvim, copilot.vim, minuet-ai (Ollama) |
-| **UI** | tokyonight, lualine, noice, trouble, todo-comments, edgy, smear-cursor, minty/menu, which-key |
+| **UI** | tokyonight, lualine, noice + nvim-notify, trouble, todo-comments, edgy, smear-cursor, minty/menu, which-key, vim-startuptime |
 
 Language servers configured: `lua_ls`, `ts_ls`, `eslint`, `jsonls`, `html`, `cssls`,
 `tailwindcss`, `pyright`, `marksman`, `bashls`, `yamlls`, `taplo`, `dockerls`, `clangd`,
