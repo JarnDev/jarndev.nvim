@@ -129,7 +129,9 @@ return {
           '--clang-tidy',
           '--header-insertion=iwyu',
           '--completion-style=detailed',
-          '--function-arg-placeholders',
+          -- clangd >= 20 requires an explicit boolean here; bare it is parsed as
+          -- invalid and the flag is silently dropped.
+          '--function-arg-placeholders=1',
           '--fallback-style=llvm',
         },
         init_options = {
