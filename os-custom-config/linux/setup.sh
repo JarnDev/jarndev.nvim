@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
-# Bootstrap script for a new machine.
-# Installs chezmoi and applies your private dotfiles repo.
+# Bootstrap script for a new machine: the HOME half.
+# Installs chezmoi and applies the private dotfiles repo -- shell rc files, kitty.conf,
+# starship.toml, yazi, the SSH config and the Claude Code status line.
+#
+# This is one of two halves and does not touch Neovim. For the editor run
+# install-nvim.sh in this directory; neither script calls the other.
 #
 # Usage:
 #   DOTFILES_REPO=git@github.com:you/dotfiles.git bash setup.sh

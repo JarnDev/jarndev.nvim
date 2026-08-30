@@ -75,6 +75,22 @@ export NVIM_APPNAME="jarndev.nvim"
 Data, state and installed tools then live under `~/.local/share/jarndev.nvim/`,
 completely separate from any other Neovim setup.
 
+### Dotfiles (a separate repo)
+
+This repository is the Neovim configuration and nothing else. The rest of the home
+directory — shell rc files, `kitty.conf`, `starship.toml`, yazi, the SSH config and the
+Claude Code status line — lives in a separate **private** repo managed with
+[chezmoi](https://chezmoi.io), bootstrapped by:
+
+```sh
+bash os-custom-config/linux/setup.sh          # DOTFILES_REPO=... to override
+```
+
+The two halves are independent on purpose: this one is public and installable with no
+credentials, that one is private and needs SSH access to GitHub. A new machine wants
+both — `setup.sh` for the home directory, `install-nvim.sh` for the editor. Neither
+calls the other.
+
 ## Required Setup
 
 `install-nvim.sh` performs steps 1 and 3 automatically. Everything below is documented

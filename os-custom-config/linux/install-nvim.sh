@@ -407,6 +407,12 @@ PKG_INSTALL="sudo apt-get install -y"; [ "$DISTRO" = arch ] && PKG_INSTALL="sudo
 command -v cmake >/dev/null || todo+=("$PKG_INSTALL cmake    # projetos C/C++ com compile_commands.json (clangd)")
 command -v mpv   >/dev/null || todo+=("$PKG_INSTALL mpv      # reproducao de video (<leader>rv)")
 
+# This script only sets up the editor. The rest of the home directory -- shell rc files,
+# kitty.conf, starship.toml, the Claude Code status line -- is a separate private repo.
+# Mentioning it here is the only link between the two halves.
+[ -d "$HOME/.local/share/chezmoi" ] \
+  || todo+=("bash $(dirname "$0")/setup.sh    # dotfiles do \$HOME (chezmoi, repo privado): shell, kitty, starship, statusline")
+
 # ----------------------------------------------------------------------------- fim
 echo
 log "resumo:"
