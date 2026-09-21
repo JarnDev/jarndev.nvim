@@ -109,7 +109,9 @@ missing — the capability is simply absent rather than erroring:
 ## Keymaps
 
 Leader is <kbd>Space</kbd>. `:WhichKey` or simply pressing <kbd>Space</kbd> shows these
-live; `<leader>sk` searches every mapping. `<leader>?` opens a Vim key reference drawer.
+live; `<leader>sk` searches every mapping. `<leader>?` opens
+`doc/reference.md` in a drawer — Vim's builtin keys plus every installed
+plugin, with `<C-f>` to fuzzy-jump inside it.
 
 ### Navigation
 

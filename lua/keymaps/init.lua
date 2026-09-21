@@ -31,19 +31,29 @@ map({ 'n', 't' }, '[[', function()
   Snacks.words.jump(-vim.v.count1)
 end, { desc = 'Previous reference' })
 
--- Vim special keys reference drawer
+-- Config reference drawer: vim builtins + every installed plugin.
+-- <C-f> fuzzy-jumps within the doc; plain `/` still searches, since this is a
+-- real buffer and not a floating preview.
 map('n', '<leader>?', function()
   Snacks.win {
-    file = vim.fn.stdpath 'config' .. '/doc/vim-keys.md',
-    width = 0.6,
+    file = vim.fn.stdpath 'config' .. '/doc/reference.md',
+    width = 0.7,
     height = 0.85,
     border = 'rounded',
-    title = ' Vim Keys Reference ',
+    title = ' Neovim Reference ',
     title_pos = 'center',
     wo = { wrap = false, conceallevel = 2 },
-    keys = { q = 'close', ['<Esc>'] = 'close' },
+    keys = {
+      q = 'close',
+      ['<Esc>'] = 'close',
+      -- The picker's `main` window defaults to current=false/float=false, which
+      -- would make it grep the buffer *behind* this float instead of the doc.
+      ['<C-f>'] = function()
+        Snacks.picker.lines { main = { current = true, float = true } }
+      end,
+    },
   }
-end, { desc = 'Vim keys reference' })
+end, { desc = 'Config reference (vim keys + plugins)' })
 
 -- Play video under cursor (or entered path) with mpv in its own window
 map('n', '<leader>rv', function()

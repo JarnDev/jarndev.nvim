@@ -54,7 +54,7 @@ return {
       { '<leader>q', group = '[Q]uit / Sessions' },
       { '<leader><Tab>', group = 'Buffers' },
       { '<leader>H', desc = 'Home dashboard' },
-      { '<leader>?', desc = 'Vim keys reference' },
+      { '<leader>?', desc = 'Config reference (vim + plugins)' },
     },
   },
 }

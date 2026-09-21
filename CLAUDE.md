@@ -223,6 +223,10 @@ inline per-line cost annotations. `:Lazy profile` and `Snacks.profiler` profile
 
 ## Useful In-Editor Commands
 
+- `<leader>?` — `doc/reference.md` in a drawer: Vim builtins + every installed plugin,
+  `<C-f>` fuzzy-jumps inside it. **Keep it in sync when adding or rebinding a plugin** —
+  it is written from the specs, so a stale entry is worse than a missing one. The live
+  source of truth is `<leader>sk` (snacks keymaps), which reads the real mappings.
 - `:Lazy` — plugin manager UI (update, install, profile)
 - `:Mason` — LSP/tool installer
 - `:ConformInfo` — formatter status
