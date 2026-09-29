@@ -8,7 +8,14 @@ return {
   'folke/edgy.nvim',
   event = 'VeryLazy',
   keys = {
-    { '<leader>ue', '<cmd>EdgyToggle<cr>', desc = 'UI: toggle [E]dgy sidebars' },
+    -- edgy has no user commands; toggle() is its Lua API.
+    {
+      '<leader>ue',
+      function()
+        require('edgy').toggle()
+      end,
+      desc = 'UI: toggle [E]dgy sidebars',
+    },
   },
   opts = {
     animate = { enabled = false },

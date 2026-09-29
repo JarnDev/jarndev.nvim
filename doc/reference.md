@@ -494,8 +494,8 @@ Task runner with a results list wired into the quickfix.
 | --- | --- |
 | `<leader>oo` | Toggle the task list |
 | `<leader>or` | Run a task |
-| `<leader>oa` | Quick action on a task (restart, stop, open output) |
-| `<leader>oi` | Overseer info |
+| `<leader>oa` | Pick a task, then an action on it (restart, stop, open output) |
+| `<leader>oi` | Overseer health (`:checkhealth overseer`) |
 
 The list docks to the bottom at 30% height.
 

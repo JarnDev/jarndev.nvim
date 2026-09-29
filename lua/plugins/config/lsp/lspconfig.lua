@@ -140,7 +140,9 @@ return {
           clangdFileStatus = true,
         },
       },
-      cmake = {},
+      -- neocmakelsp, not cmake-language-server: the latter is unmaintained and its
+      -- mason venv resolves pygls 2.x, which it cannot import (dies on start).
+      neocmake = {},
     }
 
     for name, cfg in pairs(servers) do
