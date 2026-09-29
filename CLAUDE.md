@@ -39,7 +39,7 @@ lua/
       ai/             codecompanion.nvim, claudecode.nvim
       completion/     blink.cmp
       database/       vim-dadbod, dadbod-ui, dadbod-completion
-      editor/         which-key, autopairs, debug, lint, hover, oil, grug-far, kulala, markdown, sleuth,
+      editor/         which-key, autopairs, debug, lint, hover, oil, grug-far, markdown, sleuth,
                       harpoon, refactoring, ts-comments, overseer, neogen, dial, yanky, smart-splits
       formatting/     conform.nvim (stylua + prettierd)
       git/            gitsigns, diffview, octo
@@ -84,7 +84,7 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 | AI | codecompanion.nvim (`<leader>aa/ai/ac/ap`), claudecode.nvim (`<leader>aT/af`) |
 | Completion | blink.cmp (LSP + snippets + copilot + dadbod) |
 | Database | vim-dadbod, dadbod-ui, dadbod-completion |
-| Editor | which-key, nvim-autopairs, nvim-dap+ui (python/C/C++/JS), nvim-lint, hover.nvim, oil.nvim (`-`), grug-far (`<leader>S`), kulala (`<leader>rr`) |
+| Editor | which-key, nvim-autopairs, nvim-dap+ui (python/C/C++/JS), nvim-lint, hover.nvim, oil.nvim (`-`), grug-far (`<leader>S`) |
 | Navigation | harpoon2 (`<leader>j*`, `<leader>1-4`), smart-splits (`<C-hjkl>` / `<A-hjkl>`), window-picker (`<leader>wp`), flash (`s`/`S`) |
 | Refactor/Docs | refactoring.nvim (`<leader>cr`), neogen (`<leader>cd`), inc-rename (`<leader>cn`), ts-comments (fixes `gc` in JSX) |
 | Tasks | overseer.nvim (`<leader>o*`) |

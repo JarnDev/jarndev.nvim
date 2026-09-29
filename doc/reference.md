@@ -499,18 +499,6 @@ Task runner with a results list wired into the quickfix.
 
 The list docks to the bottom at 30% height.
 
-### kulala.nvim
-
-An HTTP client: write requests in a `.http` file and run them in place. All keys
-are `http`-filetype only.
-
-| Key | Action |
-| --- | --- |
-| `<leader>rr` | Run the request under the cursor |
-| `<leader>rR` | Run every request in the file |
-| `<leader>re` | Select the environment |
-| `<leader>ri` | Inspect the request that would be sent |
-
 ### nvim-lint
 
 Linters that are not language servers, run on `BufEnter`, `BufWritePost` and

@@ -180,7 +180,6 @@ plugin, with `<C-f>` to fuzzy-jump inside it.
 | `<leader>db` `<leader>dc` `<leader>di` `<leader>do` `<leader>dO` | Breakpoint / continue / step in / over / out |
 | `<leader>du` `<leader>dr` `<leader>dl` `<leader>dt` | Debug UI / REPL / run last / terminate |
 | `<leader>oo` `<leader>or` `<leader>oa` `<leader>oi` | Overseer tasks: toggle / run / action / info |
-| `<leader>rr` `<leader>rR` `<leader>re` `<leader>ri` | Kulala HTTP (in `.http` files): run / run all / set env / inspect |
 | `<leader>rv` · `<leader>mp` | Play video (mpv) · Markdown preview |
 | `<leader>lt` · `<leader>ld` | Terminal · lazydocker |
 
@@ -227,7 +226,6 @@ why it was chosen and how to use it. The table below is the inventory.
 | **Formatting** | conform.nvim — stylua, prettierd, ruff, clang-format, cmake-format |
 | **Linting** | nvim-lint — ruff, eslint_d, markdownlint-cli2, shellcheck |
 | **Database** | vim-dadbod + dadbod-ui + dadbod-completion |
-| **HTTP** | kulala.nvim |
 | **AI** | claudecode.nvim, codecompanion.nvim, copilot.vim, minuet-ai (Ollama) |
 | **UI** | tokyonight, lualine, noice + nvim-notify, trouble, todo-comments, edgy, smear-cursor, minty/menu, which-key, vim-startuptime |
 
