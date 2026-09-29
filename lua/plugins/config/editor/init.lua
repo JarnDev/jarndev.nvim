@@ -9,6 +9,7 @@ return {
   { import = 'plugins.config.editor.hover' },
   { import = 'plugins.config.editor.oil' },
   { import = 'plugins.config.editor.grug-far' },
+  { import = 'plugins.config.editor.kulala' },
   { import = 'plugins.config.editor.sessions' },
   { import = 'plugins.config.editor.flash' },
   { import = 'plugins.config.editor.inc-rename' },

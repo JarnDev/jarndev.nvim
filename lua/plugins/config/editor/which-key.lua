@@ -46,7 +46,7 @@ return {
       { '<leader>l', group = '[L]azy utils' },
       { '<leader>o', group = '[O]verseer tasks' },
       { '<leader>u', group = '[U]I / utils' },
-      { '<leader>r', group = '[R]un (media)' },
+      { '<leader>r', group = '[R]un (HTTP / media)' },
       { '<leader>s', group = '[S]earch' },
       { '<leader>t', group = '[T]esting' },
       { '<leader>w', group = '[W]orkspace' },

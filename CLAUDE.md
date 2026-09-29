@@ -39,7 +39,7 @@ lua/
       ai/             codecompanion.nvim, claudecode.nvim
       completion/     blink.cmp
       database/       vim-dadbod, dadbod-ui, dadbod-completion
-      editor/         which-key, autopairs, debug, lint, hover, oil, grug-far, markdown, sleuth,
+      editor/         which-key, autopairs, debug, lint, hover, oil, grug-far, kulala, markdown, sleuth,
                       harpoon, refactoring, ts-comments, overseer, neogen, dial, yanky, smart-splits
       formatting/     conform.nvim (stylua + prettierd)
       git/            gitsigns, diffview, octo
@@ -76,6 +76,7 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 - **refactoring.nvim needs `lewis6991/async.nvim`** as a hard runtime dependency (`refactoring.lua:45`); omitting it fails at load with `module 'async' not found`.
 - **Symbol outline is `<leader>xs`** (`Trouble symbols`) — aerial.nvim / outline.nvim are deliberately not installed. Trouble also provides `lsp_incoming_calls`, `lsp_outgoing_calls` and a `profiler` mode.
 - **`]]`/`[[` are snacks.words** LSP-reference navigation, bound in `keymaps/init.lua` (snacks enables the module but binds no keys itself).
+- **kulala comes from `mrcjkb/kulala.nvim`, pinned by `commit`** — upstream `mistweaverco/kulala.nvim` went private (404). `submodules = false` is required: the `fmt` submodule points at the also-private `kulala-fmt` and aborts the clone.
 
 ### Active Plugin Summary
 
@@ -84,7 +85,7 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 | AI | codecompanion.nvim (`<leader>aa/ai/ac/ap`), claudecode.nvim (`<leader>aT/af`) |
 | Completion | blink.cmp (LSP + snippets + copilot + dadbod) |
 | Database | vim-dadbod, dadbod-ui, dadbod-completion |
-| Editor | which-key, nvim-autopairs, nvim-dap+ui (python/C/C++/JS), nvim-lint, hover.nvim, oil.nvim (`-`), grug-far (`<leader>S`) |
+| Editor | which-key, nvim-autopairs, nvim-dap+ui (python/C/C++/JS), nvim-lint, hover.nvim, oil.nvim (`-`), grug-far (`<leader>S`), kulala (`<leader>rr`) |
 | Navigation | harpoon2 (`<leader>j*`, `<leader>1-4`), smart-splits (`<C-hjkl>` / `<A-hjkl>`), window-picker (`<leader>wp`), flash (`s`/`S`) |
 | Refactor/Docs | refactoring.nvim (`<leader>cr`), neogen (`<leader>cd`), inc-rename (`<leader>cn`), ts-comments (fixes `gc` in JSX) |
 | Tasks | overseer.nvim (`<leader>o*`) |
