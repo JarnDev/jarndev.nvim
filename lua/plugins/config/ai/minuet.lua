@@ -28,10 +28,14 @@ return {
   opts = {
     -- Ask the local model for a single completion per request (keeps the 3080 snappy).
     n_completions = 1,
-    -- How many chars of context to send around the cursor. 512/128 is a good
-    -- FIM budget for a 7B model without blowing latency.
+    -- How many chars of context to send around the cursor.
     context_window = 512,
-    request_timeout = 4,
+    -- qwen2.5-coder:14b is the only installed model that supports FIM ("insert");
+    -- the 7B was removed and qwen3-coder:30b answers "does not support insert".
+    -- Measured 12/10/2026: 3.2s for a full 64-token completion warm; a cold load
+    -- takes 33-65s, so the first request after a model swap times out and the next
+    -- ones work. It also evicts the default qwen3:8b from VRAM (10 GB fit only one).
+    request_timeout = 5,
     provider = 'openai_fim_compatible',
     provider_options = {
       openai_fim_compatible = {
@@ -39,9 +43,10 @@ return {
         api_key = 'TERM',
         name = 'Ollama',
         end_point = 'http://localhost:11434/v1/completions',
-        model = 'qwen2.5-coder:7b',
+        model = 'qwen2.5-coder:14b',
         optional = {
-          max_tokens = 256,
+          -- 256 tokens (~20 tok/s here) would blow the timeout; 64 fits in ~3.2s.
+          max_tokens = 64,
           top_p = 0.9,
         },
       },
