@@ -42,7 +42,9 @@ return {
         -- Ollama needs no key; minuet just reads an env var that exists.
         api_key = 'TERM',
         name = 'Ollama',
-        end_point = 'http://localhost:11434/v1/completions',
+        -- OLLAMA_API_BASE (zshrc): localhost on the machine with the GPU; another machine
+        -- points it at that one over the LAN / Tailscale subnet route.
+        end_point = (vim.env.OLLAMA_API_BASE or 'http://localhost:11434') .. '/v1/completions',
         model = 'qwen2.5-coder:14b',
         optional = {
           -- 256 tokens (~20 tok/s here) would blow the timeout; 64 fits in ~3.2s.

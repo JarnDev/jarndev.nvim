@@ -20,6 +20,8 @@ return {
         end,
         ollama = function()
           return require('codecompanion.adapters').extend('ollama', {
+            -- same server as minuet: OLLAMA_API_BASE, else this machine
+            env = { url = vim.env.OLLAMA_API_BASE or 'http://localhost:11434' },
             schema = {
               model = {
                 default = 'qwen2.5-coder:14b',
