@@ -44,11 +44,14 @@ return {
       end,
       desc = 'Move focus right',
     },
+    -- <A-hjkl> also in terminal mode, so the Claude Code pane (and any :terminal) resizes
+    -- without <C-\><C-n> first. Costs those four chords inside terminal programs.
     {
       '<A-h>',
       function()
         require('smart-splits').resize_left()
       end,
+      mode = { 'n', 't' },
       desc = 'Resize split left',
     },
     {
@@ -56,6 +59,7 @@ return {
       function()
         require('smart-splits').resize_down()
       end,
+      mode = { 'n', 't' },
       desc = 'Resize split down',
     },
     {
@@ -63,6 +67,7 @@ return {
       function()
         require('smart-splits').resize_up()
       end,
+      mode = { 'n', 't' },
       desc = 'Resize split up',
     },
     {
@@ -70,6 +75,7 @@ return {
       function()
         require('smart-splits').resize_right()
       end,
+      mode = { 'n', 't' },
       desc = 'Resize split right',
     },
   },

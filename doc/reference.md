@@ -413,7 +413,7 @@ Window movement and resizing that can cross into adjacent kitty panes.
 | Key | Action |
 | --- | --- |
 | `<C-h/j/k/l>` | Move focus left / down / up / right |
-| `<A-h/j/k/l>` | Resize the split left / down / up / right |
+| `<A-h/j/k/l>` | Resize the split left / down / up / right (also from inside a terminal, e.g. the Claude Code pane) |
 
 Inside Neovim this needs no setup. Crossing into a kitty pane also needs the
 kitty side wired up — see "Required Setup" in `CLAUDE.md`. At the outermost edge
