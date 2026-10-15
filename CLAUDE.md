@@ -31,7 +31,7 @@ require('plugins')    -- lazy.setup() with all plugin imports
 ```
 lua/
   bootstrap/          Leader key, Nerd Font flag, lazy.nvim install
-  core/               options.lua, autocommands.lua
+  core/               options.lua, autocommands.lua, ollama.lua (local model pick/load/unload)
   keymaps/            Global keymaps (window nav, diagnostics, mpv, etc.)
   plugins/
     init.lua          lazy.setup() — imports all config categories
@@ -82,7 +82,7 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 
 | Category | Key Plugins |
 |----------|-------------|
-| AI | codecompanion.nvim (`<leader>aa/ai/ac/ap`), claudecode.nvim (`<leader>aT/af`) |
+| AI | codecompanion.nvim (`<leader>aa/ai/ac/ap/aL`), claudecode.nvim (`<leader>aT/af`), minuet (`<leader>at/aw/au/am`) |
 | Completion | blink.cmp (LSP + snippets + copilot + dadbod) |
 | Database | vim-dadbod, dadbod-ui, dadbod-completion |
 | Editor | which-key, nvim-autopairs, nvim-dap+ui (python/C/C++/JS), nvim-lint, hover.nvim, oil.nvim (`-`), grug-far (`<leader>S`), kulala (`<leader>rr`) |

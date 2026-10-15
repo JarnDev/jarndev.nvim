@@ -21,10 +21,14 @@ return {
         ollama = function()
           return require('codecompanion.adapters').extend('ollama', {
             -- same server as minuet: OLLAMA_API_BASE, else this machine
-            env = { url = vim.env.OLLAMA_API_BASE or 'http://localhost:11434' },
+            env = { url = require('core.ollama').base },
             schema = {
               model = {
-                default = 'qwen2.5-coder:14b',
+                -- a chat-capable model already in VRAM if any (no swap), else the one
+                -- picked with <leader>am (core/ollama.lua)
+                default = function()
+                  return require('core.ollama').chat_model_now()
+                end,
               },
             },
           })

@@ -223,8 +223,9 @@ and wait to see the live menu.
 ### codecompanion.nvim
 
 Chat and inline assistant against the Anthropic API. Default model
-`claude-sonnet-4-6`; an `ollama` adapter (`qwen2.5-coder:14b`) is configured as
-a fully local alternative.
+`claude-sonnet-4-6`; an `ollama` adapter is configured as a fully local
+alternative. Its model is a chat-capable one already in VRAM if there is one (no
+swap), otherwise the one picked with `<leader>am` (default `qwen2.5-coder:14b`).
 
 | Key | Mode | Action |
 | --- | --- | --- |
@@ -249,13 +250,16 @@ selection into it.
 
 ### minuet-ai.nvim
 
-Local FIM completion via Ollama (`qwen2.5-coder:7b` at
-`localhost:11434`). Deliberately **off** by default so it never fights
+Local FIM completion via Ollama (`qwen2.5-coder:14b` at `$OLLAMA_API_BASE`,
+default `localhost:11434`). Deliberately **off** by default so it never fights
 copilot.vim's ghost text.
 
 | Key | Mode | Action |
 | --- | --- | --- |
-| `<leader>at` | n | Toggle ghost-text engine: Copilot ⇄ local Ollama |
+| `<leader>at` | n | Toggle ghost-text engine: Copilot ⇄ local Ollama (switching to local warms the model) |
+| `<leader>aw` | n | Warm the autocomplete model: reuse a loaded FIM model, else load it |
+| `<leader>au` | n | Unload every model from VRAM now |
+| `<leader>am` | n | Pick a local model (● loaded · autocomplete + chat / chat only · does not fit VRAM) |
 | `<A-y>` | i | Accept the suggestion *(local engine on)* |
 | `<A-Y>` | i | Accept one line |
 | `<A-[>` / `<A-]>` | i | Previous / next suggestion |
@@ -263,7 +267,12 @@ copilot.vim's ghost text.
 
 `<leader>at` flips `vim.g.ai_engine_local`, which also decides whether blink.cmp
 queries the `minuet` source — so when it is off, nothing hits localhost on every
-keystroke. Budget: 1 completion per request, 512-char context, 4s timeout.
+keystroke. Budget: 1 completion per request, 64 tokens, 5s timeout.
+
+Model handling lives in `lua/core/ollama.lua`. Only models with Ollama's `insert`
+capability can do fill-in-the-middle (here just `qwen2.5-coder:14b`); the others
+can only chat. A cold load takes ~35-60s, past the 5s timeout, hence the warm-up;
+loads use `keep_alive = 15m`. The pick lasts for the session.
 
 ## Completion
 
