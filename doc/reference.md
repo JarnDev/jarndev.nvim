@@ -234,6 +234,9 @@ the Claude subscription does not cover, and Claude Code already does the chat.
 
 ### claudecode.nvim -- `<leader>ac`
 
+Opens on the **right, 30% wide** (claudecode `terminal.split_side`, and an edgy slot
+of its own -- edgy docks every other snacks terminal at the bottom).
+
 | Key | Mode | Action |
 | --- | --- | --- |
 | `<leader>acc` | n | Toggle the Claude Code terminal (`:ClaudeCode`) |

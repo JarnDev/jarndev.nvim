@@ -4,6 +4,13 @@
 -- Deliberately conservative: `animate = false` (snacks.scroll already animates), and
 -- neo-tree is pinned left so auto-session's `Neotree close` / `Neotree filesystem show`
 -- hooks keep working across a save/restore cycle.
+
+-- claudecode.nvim opens Claude Code in a snacks terminal too; it gets its own slot on
+-- the right (30%) instead of the bottom one every other terminal shares.
+local function is_claude(buf)
+  return vim.api.nvim_buf_get_name(buf):lower():find('claude', 1, true) ~= nil
+end
+
 return {
   'folke/edgy.nvim',
   event = 'VeryLazy',
@@ -31,7 +38,13 @@ return {
           return vim.bo[buf].buftype == 'help'
         end,
       },
-      { ft = 'snacks_terminal', size = { height = 0.35 } },
+      {
+        ft = 'snacks_terminal',
+        size = { height = 0.35 },
+        filter = function(buf)
+          return not is_claude(buf)
+        end,
+      },
       { ft = 'dap-repl', size = { height = 0.35 } },
     },
     left = {
@@ -45,6 +58,7 @@ return {
     },
     right = {
       { ft = 'grug-far', title = 'Search / Replace', size = { width = 0.4 } },
+      { ft = 'snacks_terminal', title = 'Claude Code', size = { width = 0.3 }, filter = is_claude },
     },
     -- Never dock the dashboard or the AI chat panes.
     options = { left = { size = 34 }, bottom = { size = 12 }, right = { size = 50 } },
