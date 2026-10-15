@@ -218,7 +218,7 @@ why it was chosen and how to use it. The table below is the inventory.
 | **Completion** | blink.cmp (LSP, snippets, path, buffer, copilot, minuet, dadbod), LuaSnip |
 | **Treesitter** | nvim-treesitter (`main`), textobjects, context, autotag |
 | **Editing** | mini.ai / surround / move / hipatterns, yanky, dial, autopairs, flash, ts-comments, vim-sleuth |
-| **Markdown** | render-markdown.nvim, markdown-preview.nvim |
+| **Markdown** | render-markdown.nvim (in the buffer), live-preview.nvim (browser), markdown.nvim (lists, styles, links, TOC) |
 | **Session** | auto-session |
 | **Navigation** | harpoon2, smart-splits, window-picker, oil.nvim, neo-tree, bufferline |
 | **Refactor** | refactoring.nvim, inc-rename, neogen, grug-far |

@@ -210,6 +210,7 @@ and wait to see the live menu.
 | `<leader>e` | Eval: REPL for Python / Node (iron) |
 | `<leader>h` | Git hunk (gitsigns) |
 | `<leader>i` | Docs (devdocs, offline) |
+| `<leader>m` | Markdown: preview, tasks, lists, TOC |
 | `<leader>j` | Harpoon / jump |
 | `<leader>l` | Lazy utils (lazygit, lazydocker, terminal) |
 | `<leader>o` | Overseer tasks |
@@ -772,11 +773,35 @@ emits `{/* … */}` inside JSX instead of `// …` — likewise for `<script>` a
 checkboxes and block-styled code fences. Active in `markdown` filetypes — this
 file included.
 
-### markdown-preview.nvim
+### live-preview.nvim -- browser preview
+
+The file in the browser, updated as you type and scrolled with the buffer (also
+HTML on save, AsciiDoc, SVG; KaTeX and Mermaid in markdown). A pure-Lua server on
+`127.0.0.1:5500` -- no Node, no build step.
 
 | Key | Action |
 | --- | --- |
-| `<leader>mp` | Toggle a live browser preview *(markdown only)* |
+| `<leader>mp` | Start / stop the preview (`:LivePreview start` / `close`; `:LivePreview pick` chooses a file) |
+
+### markdown.nvim -- editing markdown
+
+Loaded in markdown buffers. Several of its default keys clash with this config and
+are moved: `gs` is mini.surround's prefix, `gl` is glance, `]c` gitsigns, `]]`/`[[`
+snacks.words.
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `<CR>` | i | At the end of a list item: a new item (same marker, next number, `[ ]`); on an empty item: ends the list |
+| `o` / `O` | n | On a list item: a new item below / above; elsewhere the plain `o` / `O` |
+| `gS{motion}{style}` | n | Toggle a style: `i` italic, `b` bold, `s` strikethrough, `c` code (`gSiwb` = bold word) |
+| `gSS{style}` | n | Same, for the whole line |
+| `gS{style}` | x | Same, for the selection |
+| `gL{motion}` / `gL` | n / x | Turn the text into a link (pasting a URL over a selection also does) |
+| `gx` | n | Follow the link: `#heading` and relative `.md` inside nvim, URLs in the browser |
+| `]h` / `[h` / `]p` | n | Next / previous / parent heading |
+| `<leader>mx` | n, x | Toggle the task checkbox |
+| `<leader>mn` | n, x | Renumber ordered lists |
+| `<leader>mt` / `<leader>mT` | n | Table of contents in the location list / insert one |
 
 ### vim-sleuth
 

@@ -42,7 +42,7 @@ lua/
       ai/             claudecode.nvim, minuet-ai.nvim
       completion/     blink.cmp
       database/       vim-dadbod, dadbod-ui, dadbod-completion
-      editor/         which-key, autopairs, debug, lint, hover, oil, grug-far, hurl, markdown, sleuth,
+      editor/         which-key, autopairs, debug, lint, hover, oil, grug-far, hurl, markdown (render), markdown-edit (markdown.nvim), live-preview, sleuth,
                       harpoon, refactoring, ts-comments, overseer, neogen, dial, yanky, smart-splits
       formatting/     conform.nvim (stylua + prettierd)
       cpp/            cmake-tools (<leader>b), clangd_extensions

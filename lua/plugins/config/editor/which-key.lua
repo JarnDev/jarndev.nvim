@@ -50,6 +50,7 @@ return {
       { '<leader>o', group = '[O]verseer tasks' },
       { '<leader>u', group = '[U]I / utils' },
       { '<leader>b', group = '[B]uild (CMake)' },
+      { '<leader>m', group = '[M]arkdown', mode = { 'n', 'x' } },
       { '<leader>i', group = 'Docs ([I]nfo, devdocs)' },
       { '<leader>e', group = '[E]val (REPL: python / node)' },
       { '<leader>v', group = '[V]ault (obsidian notes)', mode = { 'n', 'x' } },
