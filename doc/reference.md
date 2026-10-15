@@ -825,7 +825,8 @@ live mappings, so it never drifts from the config the way this file can.
 
 Dashboard keys: `f` files, `p` projects, `r` recent, `c` config, `w` grep,
 `l` Lazy, `q` quit. The JarnDev logo renders as a real image through the kitty
-graphics protocol, falls back to `chafa` block art, then to ASCII.
+graphics protocol (needs ImageMagick: Snacks.image converts through it even for a
+PNG), falls back to `chafa` block art, then to ASCII.
 
 #### Passive modules
 

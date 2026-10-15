@@ -31,7 +31,7 @@ Leader is <kbd>Space</kbd>. A Nerd Font is assumed (`vim.g.have_nerd_font = true
 | A **Nerd Font** | Icons throughout |
 | Node.js ≥ 20 | Required by several LSPs — **see [Required Setup](#required-setup)** |
 
-Optional system binaries: `mpv` (video), `chafa` (dashboard logo fallback), `ollama`
+Optional system binaries: `mpv` (video), `imagemagick` (dashboard logo image), `chafa` (dashboard logo fallback), `ollama`
 (local AI), `gh` (GitHub review), `perf`/`valgrind` (profiling), `lazygit`, `lazydocker`.
 
 ## Install

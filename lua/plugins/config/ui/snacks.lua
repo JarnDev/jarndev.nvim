@@ -9,8 +9,14 @@ local function graphics_terminal()
   return vim.env.KITTY_WINDOW_ID ~= nil or vim.env.WEZTERM_PANE ~= nil or vim.env.GHOSTTY_RESOURCES_DIR ~= nil
 end
 
+-- Snacks.image converts/resizes through ImageMagick even for a PNG: without it the
+-- reserved rows stay blank (seen on a fresh macOS), so fall through to chafa/ASCII.
+local function have_magick()
+  return vim.fn.executable 'magick' == 1 or vim.fn.executable 'convert' == 1
+end
+
 local function logo_image_ok()
-  return graphics_terminal() and vim.fn.filereadable(LOGO) == 1 and package.loaded['snacks'] ~= nil and Snacks.image.supports_terminal()
+  return graphics_terminal() and have_magick() and vim.fn.filereadable(LOGO) == 1 and package.loaded['snacks'] ~= nil and Snacks.image.supports_terminal()
 end
 
 -- Place the real logo image over the blank header rows (kitty graphics protocol).

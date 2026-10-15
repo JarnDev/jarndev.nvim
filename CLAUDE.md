@@ -105,7 +105,8 @@ System binaries that must be installed separately:
 | Binary | Purpose | Install |
 |--------|---------|---------|
 | `mpv` | Video playback (`<leader>rv`) — launches detached in its own window | `sudo apt install mpv` |
-| `chafa` | Renders the dashboard logo (`assets/logo.png`) | `sudo apt install chafa` |
+| `imagemagick` | Dashboard logo as a real image (Snacks.image converts through `magick`/`convert`, even for PNG) | `sudo apt install imagemagick` / `brew install imagemagick` |
+| `chafa` | Dashboard logo fallback as block art (`assets/logo.png`) | `sudo apt install chafa` |
 | `ollama` | Local models for minuet / codecompanion (`<leader>at`, `<leader>aL`) | https://ollama.com |
 | `gh` | octo.nvim issues/PR review — needs `gh auth login` | `sudo apt install gh` |
 | `perf` / `valgrind` | Profiling C/C++ (`perf record`, `--tool=callgrind`) | `sudo apt install linux-tools-generic valgrind` |
