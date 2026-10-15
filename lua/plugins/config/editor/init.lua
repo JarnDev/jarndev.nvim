@@ -22,4 +22,5 @@ return {
   { import = 'plugins.config.editor.dial' },
   { import = 'plugins.config.editor.yanky' },
   { import = 'plugins.config.editor.smart-splits' },
+  { import = 'plugins.config.editor.glance' },
 }

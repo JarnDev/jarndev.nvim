@@ -31,7 +31,9 @@ require('plugins')    -- lazy.setup() with all plugin imports
 ```
 lua/
   bootstrap/          Leader key, Nerd Font flag, lazy.nvim install
-  core/               options.lua, autocommands.lua, ollama.lua (local model pick/load/unload)
+  core/               options.lua, autocommands.lua, ollama.lua (local model pick/load/unload),
+                      checks.lua (overseer "Check:" tasks: tsc/eslint/pyright/ruff/cmake-make)
+  overseer/component/ trouble_qflist.lua (custom overseer component, found on the rtp)
   keymaps/            Global keymaps (window nav, diagnostics, mpv, etc.)
   plugins/
     init.lua          lazy.setup() — imports all config categories
@@ -75,6 +77,7 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 - **neoconf must be set up before any `vim.lsp.config()` call** — it is a dependency of nvim-lspconfig and `require('neoconf').setup{}` is the first line of that spec's `config` function.
 - **refactoring.nvim needs `lewis6991/async.nvim`** as a hard runtime dependency (`refactoring.lua:45`); omitting it fails at load with `module 'async' not found`.
 - **Symbol outline is `<leader>xs`** (`Trouble symbols`) — aerial.nvim / outline.nvim are deliberately not installed. Trouble also provides `lsp_incoming_calls`, `lsp_outgoing_calls` and a `profiler` mode.
+- **File renames reach the LSP**: oil (`OilActionsPost`) and neo-tree (`file_moved`/`file_renamed`) call `Snacks.rename.on_rename_file`, so tsserver & co. rewrite imports. oil passes `oil://` URLs -- strip the scheme first.
 - **`]]`/`[[` are snacks.words** LSP-reference navigation, bound in `keymaps/init.lua` (snacks enables the module but binds no keys itself).
 - **kulala comes from `mrcjkb/kulala.nvim`, pinned by `commit`** — upstream `mistweaverco/kulala.nvim` went private (404). `submodules = false` is required: the `fmt` submodule points at the also-private `kulala-fmt` and aborts the clone.
 
@@ -86,14 +89,14 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 | Completion | blink.cmp (LSP + snippets + copilot + dadbod) |
 | Database | vim-dadbod, dadbod-ui, dadbod-completion |
 | Editor | which-key, nvim-autopairs, nvim-dap+ui (python/C/C++/JS), nvim-lint, hover.nvim, oil.nvim (`-`), grug-far (`<leader>S`), kulala (`<leader>rr`) |
-| Navigation | harpoon2 (`<leader>j*`, `<leader>1-4`), smart-splits (`<C-hjkl>` / `<A-hjkl>`), window-picker (`<leader>wp`), flash (`s`/`S`) |
+| Navigation | harpoon2 (`<leader>j*`, `<leader>1-4`), smart-splits (`<C-hjkl>` / `<A-hjkl>`), window-picker (`<leader>wp`), flash (`s`/`S`), dropbar breadcrumbs (`<leader>;`), glance (`gld/glr/gli/glt`) |
 | Refactor/Docs | refactoring.nvim (`<leader>cr`), neogen (`<leader>cd`), inc-rename (`<leader>cn`), ts-comments (fixes `gc` in JSX) |
 | Tasks | overseer.nvim (`<leader>o*`) |
 | Editing | yanky (`p`/`P`, `<leader>p`), dial (`<C-a>`/`<C-x>`), mini.ai/surround/move |
 | Formatting | conform.nvim (`<leader>f`): stylua + prettierd |
 | Git | gitsigns (`<leader>h*`), diffview (`<leader>gd/gh/gH/gc`), octo (`<leader>gp/gi/gr/gO`, needs `gh auth login`) |
 | LSP | nvim-lspconfig + mason + fidget + neoconf (`<leader>cN`) |
-| Testing | neotest (`<leader>tt/tf/ts/to/td`) |
+| Testing | neotest: python, jest, ctest for C/C++ (`<leader>tt/tf/ts/to/td`) |
 | UI | snacks.nvim (dashboard/picker/lazygit/terminal/indent/notifier/scroll/words), trouble (`<leader>xx/xd/xq/xs`), lualine, noice, neo-tree, tokyonight, edgy, smear-cursor, minty (`<leader>uc`), mini.hipatterns |
 
 ## External Dependencies

@@ -24,6 +24,21 @@ return {
     },
   },
   opts = {
+    -- Renaming/moving in the tree tells the LSP, so imports pointing at the file follow.
+    event_handlers = {
+      {
+        event = 'file_moved',
+        handler = function(data)
+          Snacks.rename.on_rename_file(data.source, data.destination)
+        end,
+      },
+      {
+        event = 'file_renamed',
+        handler = function(data)
+          Snacks.rename.on_rename_file(data.source, data.destination)
+        end,
+      },
+    },
     sources = { 'filesystem', 'buffers', 'git_status', 'document_symbols' },
     open_files_do_not_replace_types = { 'terminal', 'Trouble', 'trouble', 'qf', 'Outline' },
     filesystem = {

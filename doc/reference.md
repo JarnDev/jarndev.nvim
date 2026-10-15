@@ -365,6 +365,25 @@ create by adding a line, then `:w` to apply.
 Hidden files are shown. This is the "operate on files" tool; neo-tree is the
 "see the tree" tool.
 
+Moving or renaming a file here (and in neo-tree) is passed to the LSP
+(`Snacks.rename`, `workspace/willRenameFiles`), so e.g. tsserver rewrites the
+imports that pointed at it.
+
+### glance.nvim
+
+Peek definitions / references / implementations in a floating list with an
+editable preview, without leaving the buffer (the snacks picker `gd`/`gr` jump
+away; trouble is a docked list).
+
+| Key | Action |
+| --- | --- |
+| `gld` | Glance definitions |
+| `glr` | Glance references |
+| `gli` | Glance implementations |
+| `glt` | Glance type definitions |
+
+Inside: `<CR>` opens the location, `q` closes, the preview is a real buffer.
+
 ### harpoon2
 
 Pin a few files and reach them by slot — muscle memory, not search.
@@ -505,6 +524,21 @@ Task runner with a results list wired into the quickfix.
 | `<leader>oi` | Overseer health (`:checkhealth overseer`) |
 
 The list docks to the bottom at 30% height.
+
+**Project checks** (`lua/core/checks.lua`), offered by `<leader>or` when the
+current buffer's project has the marker file. They run once, in the background,
+and their errors go to the quickfix and open in trouble (or a "nenhum problema"
+notification) -- the on-demand alternative to making the LSP analyse a whole repo.
+
+| Task | Runs | Shown when the project has |
+| --- | --- | --- |
+| Check: typecheck TS/JS | `tsc --noEmit` (project's, else Mason's) | `tsconfig.json` / `jsconfig.json` |
+| Check: lint JS/TS | `eslint .` (project's, else Mason's eslint_d) | an eslint config |
+| Check: typecheck Python | `pyright` (Mason) | `pyproject.toml`, `setup.py`, `requirements.txt`... |
+| Check: lint Python | `ruff check` (Mason) | same |
+| Check: build C/C++ | `cmake --build build` (configures `build/` once) or `make -k` | `CMakeLists.txt` / `Makefile` |
+
+Tests are not here: they are neotest's job (`<leader>t*`).
 
 ### kulala.nvim
 
@@ -735,7 +769,8 @@ No keys. The LSP progress spinner in the bottom right.
 
 ### neotest
 
-Adapters: `neotest-python` and `neotest-jest` (via `npx jest`, with `CI=true`).
+Adapters: `neotest-python`, `neotest-jest` (via `npx jest`, with `CI=true`) and
+`neotest-ctest` for C/C++ (GoogleTest, Catch2, doctest, CppUnit through CTest).
 
 | Key | Action |
 | --- | --- |
@@ -747,6 +782,32 @@ Adapters: `neotest-python` and `neotest-jest` (via `npx jest`, with `CI=true`).
 
 Results appear as virtual text next to each test, output opens automatically on
 run, and failures go to `Trouble quickfix` rather than the plain quickfix.
+
+**C/C++ needs**: test files named `*_test.cpp` (`.cc`/`.cxx`), and a configured,
+built `build/` -- neotest runs `ctest` there, it does not compile. Rebuild after
+editing (`Check: build C/C++` in `<leader>or`), then `<leader>tt`. Debugging
+(`<leader>td`) uses codelldb, registered by autodap. Minimal CMake + GoogleTest:
+
+```cmake
+cmake_minimum_required(VERSION 3.20)
+project(meu_projeto CXX)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)   # clangd
+
+include(FetchContent)
+FetchContent_Declare(googletest
+  URL https://github.com/google/googletest/archive/refs/tags/v1.15.2.tar.gz)
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+add_executable(tests tests/soma_test.cpp)
+target_link_libraries(tests GTest::gtest_main)
+include(GoogleTest)
+gtest_discover_tests(tests)
+```
+
+`cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug && cmake --build build` once
+(Debug keeps symbols for `<leader>td`).
 
 ## Treesitter
 
@@ -953,8 +1014,20 @@ fighting for space.
 | `<leader>ue` | Toggle the docked sidebars |
 
 Bottom: quickfix, trouble (35%), overseer (30%), help (40%), snacks terminal,
-dap-repl. Left: neo-tree (34 cols). Right: grug-far (40%). Animation is off,
-since snacks.scroll already animates.
+dap-repl. Left: neo-tree (34 cols). Right: grug-far (40%), Claude Code (30%).
+Animation is off, since snacks.scroll already animates.
+
+### dropbar.nvim
+
+Breadcrumbs in the winbar: `src › services › user.ts › UserService › create()`.
+Every segment is pickable -- a directory lists its siblings, a symbol its
+neighbours -- so it doubles as a jump menu in a big tree.
+
+| Key | Action |
+| --- | --- |
+| `<leader>;` | Pick a breadcrumb segment |
+| `[;` | Go to the start of the current context |
+| `];` | Select the next context |
 
 ### nvim-window-picker
 

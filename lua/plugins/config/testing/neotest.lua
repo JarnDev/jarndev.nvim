@@ -7,6 +7,8 @@ return {
     'nvim-neotest/neotest-python',
     'nvim-neotest/nvim-nio',
     'haydenmeade/neotest-jest',
+    -- C/C++ through CTest: GoogleTest, Catch2, doctest, CppUnit (needs a configured build dir)
+    'orjangj/neotest-ctest',
   },
   keys = {
     { '<leader>tt', desc = 'Run nearest test' },
@@ -19,6 +21,8 @@ return {
     require('neotest').setup {
       adapters = {
         require 'neotest-python',
+        -- <leader>td: codelldb is registered by autodap (editor/autodap.lua) on C/C++ buffers
+        require('neotest-ctest').setup { dap_adapter = 'codelldb' },
         require 'neotest-jest' {
           jestCommand = 'npx jest',
           jestConfigFile = function(file)

@@ -13,4 +13,9 @@ return {
   opts = {
     task_list = { direction = 'bottom', min_height = 12 },
   },
+  config = function(_, opts)
+    require('overseer').setup(opts)
+    -- "Check: ..." templates: typecheck / lint / build for TS-JS, Python, C/C++
+    require('core.checks').register()
+  end,
 }
