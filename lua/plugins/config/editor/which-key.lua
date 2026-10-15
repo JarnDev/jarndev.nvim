@@ -42,6 +42,7 @@ return {
       { '<leader>al', group = '[L]ocal model (Ollama autocomplete)' },
       { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
       { '<leader>d', group = '[D]ebug' },
+      { '<leader>D', group = '[D]atabase (dadbod)' },
       { '<leader>g', group = '[G]it' },
       { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
       { '<leader>j', group = 'Harpoon / [J]ump' },

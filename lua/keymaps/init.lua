@@ -131,6 +131,10 @@ vim.keymap.set('n', '<leader>uu', function()
   vim.cmd 'Undotree'
 end, { desc = 'UI: [U]ndo tree' })
 
+-- Plugin and tool managers
+vim.keymap.set('n', '<leader>ul', '<cmd>Lazy<cr>', { desc = 'UI: [L]azy (plugins)' })
+vim.keymap.set('n', '<leader>um', '<cmd>Mason<cr>', { desc = 'UI: [M]ason (LSP / tools)' })
+
 -- Git worktrees (core/worktree.lua)
 vim.keymap.set('n', '<leader>gw', function()
   require('core.worktree').pick()

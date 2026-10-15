@@ -40,7 +40,7 @@ return {
         map('gI', function()
           Snacks.picker.lsp_implementations()
         end, '[G]oto [I]mplementation')
-        map('<leader>D', function()
+        map('<leader>cD', function()
           Snacks.picker.lsp_type_definitions()
         end, 'Type [D]efinition')
         map('<leader>ds', function()

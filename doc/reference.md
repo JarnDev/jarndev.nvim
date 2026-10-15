@@ -188,6 +188,7 @@ From `lua/keymaps/init.lua`. These belong to no plugin.
 | `<leader>?` | n | This reference -- opens folded: `s` section picker (with preview), `<CR>` open a section, `zR`/`zM` all, `<C-f>` search lines |
 | `<leader>rv` | n | Play video under cursor with mpv (detached window) |
 | `<leader>uu` | n | Undo tree (Neovim's builtin `nvim.undotree`; `undofile` keeps history across sessions) |
+| `<leader>ul` / `<leader>um` | n | `:Lazy` (plugins) / `:Mason` (LSP servers, tools) |
 | arrows | n | Disabled, echoes a reminder to use `hjkl` |
 
 `<leader>rv` takes the path under the cursor if it resolves to a file,
@@ -204,6 +205,7 @@ and wait to see the live menu.
 | `<leader>b` | Build: CMake (cmake-tools) + `:Asm` |
 | `<leader>c` | Code (LSP actions, refactor, docstring, neoconf) |
 | `<leader>d` | Debug (dap) |
+| `<leader>D` | Database (dadbod-ui) |
 | `<leader>g` | Git (diffview, octo, gitbrowse) |
 | `<leader>e` | Eval: REPL for Python / Node (iron) |
 | `<leader>h` | Git hunk (gitsigns) |
@@ -364,14 +366,13 @@ model with `<leader>alt`.
 
 A SQL client inside Neovim. The drawer opens on the **right**, 30 columns wide.
 
-| Command | Action |
-| --- | --- |
-| `:DBUIToggle` | Open / close the connection drawer |
-| `:DBUI` | Open the drawer |
-| `:DBUIAddConnection` | Add a connection URL |
-| `:DBUIFindBuffer` | Attach the current buffer to a connection |
-| `:DBUIRenameBuffer` | Rename the current query buffer |
-| `:DBUILastQueryInfo` | Timing / row count of the last query |
+| Key | Command | Action |
+| --- | --- | --- |
+| `<leader>Dd` | `:DBUIToggle` | Open / close the connection drawer |
+| `<leader>Da` | `:DBUIAddConnection` | Add a connection URL |
+| `<leader>Df` | `:DBUIFindBuffer` | Attach the current buffer to a connection |
+| `<leader>Dl` | `:DBUILastQueryInfo` | Timing / row count of the last query |
+| | `:DBUIRenameBuffer` | Rename the current query buffer |
 
 In the drawer: `o` or `<CR>` expands, `S` opens in a split, `d` deletes,
 `R` refreshes. In a `.sql` buffer, `<leader>W` saves the query and blink
@@ -585,18 +586,26 @@ so they do not leak on a shared screen, a recording or a demo.
 
 ### iron.nvim -- REPL (`<leader>e`)
 
-A Python (IPython when installed) or Node REPL in a right split. Send code to it
-from the buffer; it is a real terminal, so you can also type into it.
+A Python (IPython when installed) or Node REPL in a right split. It is a real
+terminal, so you can also type into it.
+
+`<leader>ep` / `<leader>ej` start one **from anywhere** -- a markdown note, the
+dashboard, a Lua file. A buffer with no REPL of its own is attached to the one just
+opened, so the send keys work from it too (the last one opened wins). In `.py` /
+`.js` / `.ts` files the send keys go to that language's REPL, started on the first
+send. Without any REPL the send keys just say so.
 
 | Key | Mode | Action |
 | --- | --- | --- |
-| `<leader>er` | n | Open / close the REPL for this filetype |
+| `<leader>ep` | n | Python REPL (IPython), from anywhere -- opens and focuses it |
+| `<leader>ej` | n | Node REPL, from anywhere |
+| `<leader>er` | n | Show / hide this buffer's REPL (asks Python / Node when it has none) |
 | `<leader>el` | n | Send the line |
 | `<leader>es` | x | Send the selection |
-| `<leader>ep` | n | Send the paragraph |
+| `<leader>em` | n | Send a motion (`<leader>em` + `ap` for a paragraph, `af`, `3j`...) |
+| `<leader>eu` | n | Send the file from the top until the cursor |
 | `<leader>eb` / `<leader>en` | n | Send the `# %%` cell / and jump to the next |
 | `<leader>ef` | n | Send the whole file |
-| `<leader>em` | n | Send a motion (`<leader>em` + `ip`, `af`...) |
 | `<leader>ei` / `<leader>ec` / `<leader>eq` | n | Interrupt / clear / quit |
 | `<leader>eR` | n | Restart |
 
@@ -759,7 +768,7 @@ emits `{/* … */}` inside JSX instead of `// …` — likewise for `<script>` a
 
 ### render-markdown.nvim
 
-No keys. Renders markdown in the buffer: heading icons, bulleted glyphs,
+`<leader>uM` turns it on / off. Renders markdown in the buffer: heading icons, bulleted glyphs,
 checkboxes and block-styled code fences. Active in `markdown` filetypes — this
 file included.
 
@@ -894,7 +903,7 @@ picker, call hierarchy through trouble.
 | `gI` | n | Goto implementation |
 | `gD` | n | Goto declaration |
 | `K` | n | Hover |
-| `<leader>D` | n | Type definition |
+| `<leader>cD` | n | Type definition |
 | `<leader>ds` | n | Document symbols |
 | `<leader>ws` | n | Workspace symbols |
 | `<leader>cn` | n | Rename, with live preview (inc-rename) |
@@ -1041,7 +1050,7 @@ which is why it is loaded eagerly.
 
 ### nvim-treesitter-context
 
-No keys. Pins up to 3 lines of enclosing context (function/class signature) to
+`<leader>ux` turns it on / off. Pins up to 3 lines of enclosing context (function/class signature) to
 the top of the window when the opening line scrolls away.
 
 ### nvim-ts-autotag

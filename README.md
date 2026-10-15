@@ -134,7 +134,7 @@ plugin, with `<C-f>` to fuzzy-jump inside it.
 
 | Key | Action |
 | --- | --- |
-| `gd` `gr` `gI` `gD` `<leader>D` | Definition / references / implementation / declaration / type def |
+| `gd` `gr` `gI` `gD` `<leader>cD` | Definition / references / implementation / declaration / type def |
 | `<leader>ds` · `<leader>ws` | Document · workspace symbols |
 | `<leader>xs` | Symbol outline (Trouble) |
 | `<leader>ci` · `<leader>co` | Incoming · outgoing calls |
@@ -258,11 +258,11 @@ then add `{ import = 'plugins.config.<category>.<name>' }` to that category's `i
 
 | Command | Purpose |
 | --- | --- |
-| `:Lazy` | Plugin manager — update, install, profile |
-| `:Mason` | LSP / tool installer |
+| `:Lazy` | Plugin manager — update, install, profile (`<leader>ul`) |
+| `:Mason` | LSP / tool installer (`<leader>um`) |
 | `:ConformInfo` | Formatter status for the buffer |
 | `:Neoconf` | Project-local settings |
-| `:DBUI` / `:DBUIToggle` | SQL client (vim-dadbod-ui) — no keymap, commands only |
+| `:DBUI` / `:DBUIToggle` | SQL client (vim-dadbod-ui) — `<leader>Dd`, group `<leader>D` |
 | `:checkhealth` | Full diagnostic health check |
 | `:StartupTime` | Startup profiling |
 

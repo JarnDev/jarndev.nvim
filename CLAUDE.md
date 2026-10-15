@@ -89,14 +89,14 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 |----------|-------------|
 | AI | claudecode.nvim (`<leader>ac*`), minuet (`<leader>al*`), copilot.vim (`<M-l>`) |
 | Completion | blink.cmp (LSP + snippets + copilot + dadbod) |
-| Database | vim-dadbod, dadbod-ui, dadbod-completion |
+| Database | vim-dadbod, dadbod-ui (`<leader>D*`), dadbod-completion |
 | Editor | which-key, nvim-autopairs, nvim-dap+ui (python/C/C++/JS), nvim-lint, hover.nvim, oil.nvim (`-`), grug-far (`<leader>S`), hurl (`<leader>rr`) |
 | Navigation | harpoon2 (`<leader>j*`, `<leader>1-4`), smart-splits (`<C-hjkl>` / `<A-hjkl>`), window-picker (`<leader>wp`), flash (`s`/`S`), dropbar breadcrumbs (`<leader>;`), glance (`gld/glr/gli/glt`) |
 | Refactor/Docs | refactoring.nvim (`<leader>cr`), neogen (`<leader>cd`), inc-rename (`<leader>cn`), ts-comments (fixes `gc` in JSX) |
 | Tasks | overseer.nvim (`<leader>o*`) |
 | Editing | yanky (`p`/`P`, `<leader>p`), dial (`<C-a>`/`<C-x>`), mini.ai/surround/move (`<A-hjkl>` on a selection), multicursor (`<C-Up/Down>`, `<leader>n/N`), undotree (`<leader>uu`) |
 | Docs | devdocs offline, C/C++ by default (`<leader>i*`) |
-| REPL | iron.nvim: IPython / node in a split (`<leader>e*`) |
+| REPL | iron.nvim: IPython / node in a split, startable from any buffer (`<leader>ep` / `<leader>ej`, sends `<leader>e*`) |
 | Notes | obsidian.nvim on `~/git/vault` (`<leader>v*`): no frontmatter, title = file name, new notes in `00-Inbox` |
 | Git worktrees | `core/worktree.lua` (`<leader>gw` switch, `<leader>gW` new) |
 | GitHub Projects | `core/ghproject.lua` board picker (`<leader>gj`), `<C-s>` sets Status; gh without `$GITHUB_TOKEN` |
