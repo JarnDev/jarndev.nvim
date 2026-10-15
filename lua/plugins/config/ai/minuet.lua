@@ -29,6 +29,23 @@ local function warm_model()
   end)
 end
 
+-- Drop the model from VRAM now (keep_alive 0) instead of waiting for keep_alive to
+-- expire: frees the 3080 for qwen3:8b, ComfyUI, games...
+local function unload_model()
+  vim.system({
+    'curl', '-sf', '--max-time', '30', '-X', 'POST', OLLAMA .. '/api/generate',
+    '-d', vim.json.encode { model = MODEL, keep_alive = 0 },
+  }, { text = true }, function(r)
+    vim.schedule(function()
+      if r.code == 0 then
+        vim.notify('AI local: ' .. MODEL .. ' descarregado da VRAM', vim.log.levels.INFO)
+      else
+        vim.notify(('AI local: falhou ao descarregar %s em %s (curl %d)'):format(MODEL, OLLAMA, r.code), vim.log.levels.WARN)
+      end
+    end)
+  end)
+end
+
 -- Flip the inline ghost-text engine between GitHub Copilot (cloud) and the
 -- local Ollama model. Default is Copilot, matching prior behaviour.
 local function toggle_ai_engine()
@@ -53,6 +70,7 @@ return {
   keys = {
     { '<leader>at', toggle_ai_engine, desc = '[A]I [T]oggle local/copilot' },
     { '<leader>aw', warm_model, desc = '[A]I [W]arm local model (load into VRAM)' },
+    { '<leader>au', unload_model, desc = '[A]I [U]nload local model (free VRAM)' },
   },
   opts = {
     -- Ask the local model for a single completion per request (keeps the 3080 snappy).
