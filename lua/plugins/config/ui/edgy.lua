@@ -11,6 +11,12 @@ local function is_claude(buf)
   return vim.api.nvim_buf_get_name(buf):lower():find('claude', 1, true) ~= nil
 end
 
+-- edgy turns a floating window that matches a slot into a split. lazygit, lazydocker
+-- and k9s are snacks terminals in a float, so the terminal slots skip floats.
+local function is_float(win)
+  return vim.api.nvim_win_get_config(win).relative ~= ''
+end
+
 return {
   'folke/edgy.nvim',
   event = 'VeryLazy',
@@ -41,8 +47,8 @@ return {
       {
         ft = 'snacks_terminal',
         size = { height = 0.35 },
-        filter = function(buf)
-          return not is_claude(buf)
+        filter = function(buf, win)
+          return not is_claude(buf) and not is_float(win)
         end,
       },
       { ft = 'dap-repl', size = { height = 0.35 } },
@@ -58,7 +64,14 @@ return {
     },
     right = {
       { ft = 'grug-far', title = 'Search / Replace', size = { width = 0.4 } },
-      { ft = 'snacks_terminal', title = 'Claude Code', size = { width = 0.3 }, filter = is_claude },
+      {
+        ft = 'snacks_terminal',
+        title = 'Claude Code',
+        size = { width = 0.3 },
+        filter = function(buf, win)
+          return is_claude(buf) and not is_float(win)
+        end,
+      },
     },
     -- Never dock the dashboard or the AI chat panes.
     options = { left = { size = 34 }, bottom = { size = 12 }, right = { size = 50 } },
