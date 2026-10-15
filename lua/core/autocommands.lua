@@ -52,3 +52,14 @@ vim.api.nvim_create_autocmd('FileType', {
     vim.opt_local.conceallevel = 2
   end,
 })
+
+-- Spell check where prose is written: Portuguese + English. ]s / [s jump, z= suggests,
+-- zg adds a word. Neovim offers to download the pt dictionary the first time.
+vim.api.nvim_create_autocmd('FileType', {
+  group = vim.api.nvim_create_augroup('ProseSpell', { clear = true }),
+  pattern = { 'markdown', 'gitcommit', 'text' },
+  callback = function()
+    vim.opt_local.spell = true
+    vim.opt_local.spelllang = { 'pt_br', 'en_us' }
+  end,
+})

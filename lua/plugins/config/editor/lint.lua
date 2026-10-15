@@ -6,6 +6,7 @@ return {
     lint.linters_by_ft = {
       markdown = { 'markdownlint-cli2' },
       python = { 'ruff' },
+      terraform = { 'tflint' },
       javascript = { 'eslint_d' },
       typescript = { 'eslint_d' },
       javascriptreact = { 'eslint_d' },

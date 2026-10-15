@@ -8,11 +8,18 @@ return {
     { 'j-hui/fidget.nvim', opts = {} },
     'saghen/blink.cmp',
     'folke/neoconf.nvim',
+    -- JSON/YAML schema catalog: package.json, tsconfig, docker-compose, GitHub Actions,
+    -- k8s manifests... get completion and validation instead of silence
+    'b0o/SchemaStore.nvim',
   },
   config = function()
     -- Must run before any vim.lsp.config() call below so project-local `.neoconf.json`
     -- settings are merged into each server's config.
     require('neoconf').setup {}
+    -- Errors only: at the default WARN level every server's chatter piled up into an
+    -- 18 MB lsp.log. Raise it for a session when debugging a server:
+    --   :lua vim.lsp.log.set_level('DEBUG')
+    vim.lsp.log.set_level 'ERROR'
     -- LSP keymaps
     vim.api.nvim_create_autocmd('LspAttach', {
       group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
@@ -106,7 +113,14 @@ return {
         },
       },
       ts_ls = {},
-      jsonls = {},
+      jsonls = {
+        settings = {
+          json = {
+            schemas = require('schemastore').json.schemas(),
+            validate = { enable = true },
+          },
+        },
+      },
       html = {},
       cssls = {},
       tailwindcss = {},
@@ -116,9 +130,18 @@ return {
 
       -- Shell / config formats
       bashls = {},
-      yamlls = {},
+      yamlls = {
+        settings = {
+          yaml = {
+            -- yamlls' own SchemaStore fetch is off: SchemaStore.nvim supplies the catalog
+            schemaStore = { enable = false, url = '' },
+            schemas = require('schemastore').yaml.schemas(),
+          },
+        },
+      },
       taplo = {},
       dockerls = {},
+      terraformls = {},
 
       -- C / C++. clangd reads compile_commands.json when present (cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1);
       -- for standalone study files it falls back to --fallback-style and default flags.
@@ -161,6 +184,8 @@ return {
     require('mason-tool-installer').setup {
       ensure_installed = {
         'stylua',
+        'ast-grep', -- grug-far's structural search/replace engine
+        'tflint',
         'markdownlint-cli2',
         'prettierd',
         'eslint_d',

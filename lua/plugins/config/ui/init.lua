@@ -14,4 +14,5 @@ return {
   { import = 'plugins.config.ui.startuptime' },
   { import = 'plugins.config.ui.edgy' },
   { import = 'plugins.config.ui.dropbar' },
+  { import = 'plugins.config.ui.showkeys' },
 }

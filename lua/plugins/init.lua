@@ -59,13 +59,16 @@ require('lazy').setup {
     { import = 'plugins.config.treesitter' },
     -- Formatting plugins
     { import = 'plugins.config.formatting' },
+    -- C/C++ (cmake-tools, clangd_extensions)
+    { import = 'plugins.config.cpp' },
   },
   defaults = {
     lazy = false,
     version = false,
   },
-  -- Plugins developed locally: `dev = true` in a spec resolves the repo from here
-  -- instead of cloning it, so edits land on the next restart. `fallback` keeps the
+  -- For developing a plugin locally: `dev = true` in its spec resolves the repo from
+  -- here instead of cloning it, so edits land on the next restart. No spec sets it by
+  -- default (autodap is installed from GitHub). `fallback` keeps the
   -- same spec working on a machine where the checkout does not exist -- lazy clones
   -- it from GitHub instead of erroring.
   dev = {

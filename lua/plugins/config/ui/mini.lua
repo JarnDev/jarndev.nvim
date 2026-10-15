@@ -46,15 +46,18 @@ return {
     }
 
     require('mini.move').setup {
+      -- Visual mode only: <A-hjkl> moves the selection. Normal-mode <A-hjkl> belongs to
+      -- smart-splits (resize), so the line_* maps are off -- `V` then <A-j>/<A-k> moves
+      -- one line. (They were <M-D-hjkl>, Alt+Super, which macOS / GNOME swallow.)
       mappings = {
-        left = '<M-D-h>',
-        right = '<M-D-l>',
-        down = '<M-D-j>',
-        up = '<M-D-k>',
-        line_left = '<M-D-h>',
-        line_right = '<M-D-l>',
-        line_down = '<M-D-j>',
-        line_up = '<M-D-k>',
+        left = '<M-h>',
+        right = '<M-l>',
+        down = '<M-j>',
+        up = '<M-k>',
+        line_left = '',
+        line_right = '',
+        line_down = '',
+        line_up = '',
       },
       options = {
         reindent_linewise = true,

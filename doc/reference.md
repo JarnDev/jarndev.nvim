@@ -17,13 +17,14 @@ Everything this config binds, in one searchable buffer.
 | [Global Keymaps](#global-keymaps) | `lua/keymaps/init.lua` — not owned by any plugin |
 | [Leader Map](#leader-map) | What each `<leader>` prefix group means |
 | [AI](#ai) | claudecode, minuet (Copilot is under Completion) |
+| [C/C++](#cc) | cmake-tools, clangd_extensions, `:Asm` |
 | [Completion](#completion) | blink.cmp, copilot.vim |
 | [Database](#database) | vim-dadbod + UI + completion |
-| [Editor](#editor) | which-key, dap, oil, harpoon, flash, yanky, dial, ... |
+| [Editor](#editor) | which-key, dap, oil, harpoon, flash, yanky, dial, multicursor, devdocs, hurl, ... |
 | [Formatting](#formatting) | conform.nvim |
 | [Git](#git) | gitsigns, diffview, octo |
 | [LSP](#lsp) | nvim-lspconfig, mason, neoconf, lazydev |
-| [Testing](#testing) | neotest |
+| [Testing](#testing) | neotest, coverage |
 | [Treesitter](#treesitter) | parsers, textobjects, context, autotag |
 | [UI](#ui) | snacks, mini, trouble, neo-tree, bufferline, noice, ... |
 | [Troubleshooting](#troubleshooting) | `:checkhealth` and friends |
@@ -184,8 +185,9 @@ From `lua/keymaps/init.lua`. These belong to no plugin.
 | `<Esc><Esc>` | t | Leave terminal mode |
 | `]d` / `[d` | n | Next / prev diagnostic (with float) |
 | `]]` / `[[` | n, t | Next / prev LSP reference (snacks.words) |
-| `<leader>?` | n | This reference |
+| `<leader>?` | n | This reference -- opens folded: `s` section picker (with preview), `<CR>` open a section, `zR`/`zM` all, `<C-f>` search lines |
 | `<leader>rv` | n | Play video under cursor with mpv (detached window) |
+| `<leader>uu` | n | Undo tree (Neovim's builtin `nvim.undotree`; `undofile` keeps history across sessions) |
 | arrows | n | Disabled, echoes a reminder to use `hjkl` |
 
 `<leader>rv` takes the path under the cursor if it resolves to a file,
@@ -199,10 +201,13 @@ and wait to see the live menu.
 | Prefix | Group |
 | --- | --- |
 | `<leader>a` | AI: `ac` Claude Code, `al` local model (minuet) |
+| `<leader>b` | Build: CMake (cmake-tools) + `:Asm` |
 | `<leader>c` | Code (LSP actions, refactor, docstring, neoconf) |
 | `<leader>d` | Debug (dap) |
 | `<leader>g` | Git (diffview, octo, gitbrowse) |
+| `<leader>e` | Eval: REPL for Python / Node (iron) |
 | `<leader>h` | Git hunk (gitsigns) |
+| `<leader>i` | Docs (devdocs, offline) |
 | `<leader>j` | Harpoon / jump |
 | `<leader>l` | Lazy utils (lazygit, lazydocker, terminal) |
 | `<leader>o` | Overseer tasks |
@@ -211,6 +216,7 @@ and wait to see the live menu.
 | `<leader>s` | Search (snacks picker) |
 | `<leader>t` | Testing (neotest) |
 | `<leader>u` | UI / utils |
+| `<leader>v` | Vault: Obsidian notes (`~/git/vault`) |
 | `<leader>w` | Workspace |
 | `<leader>x` | Diagnostics (trouble, lint) |
 | `<leader><Tab>` | Buffers |
@@ -271,6 +277,53 @@ Model handling lives in `lua/core/ollama.lua`. Only models with Ollama's `insert
 capability can do fill-in-the-middle (here just `qwen2.5-coder:14b`); the others
 can only chat, so the picker refuses them. A cold load takes ~35-60s, past the 5s timeout, hence the warm-up;
 loads use `keep_alive = 15m`. The pick lasts for the session.
+
+## C/C++
+
+### cmake-tools.nvim -- `<leader>b`
+
+Configure, build, run and debug CMake targets without leaving Neovim. The build
+tree is `./build` (shared with neotest-ctest and the `Check: build C/C++` task),
+and `compile_commands.json` is symlinked to the project root for clangd.
+
+| Key | Action |
+| --- | --- |
+| `<leader>bg` | Generate (configure) |
+| `<leader>bb` | Build -- the first time it asks for the target (`all`) |
+| `<leader>br` | Run a target |
+| `<leader>bd` | Debug a target (codelldb) |
+| `<leader>bt` | Build type: Debug / Release / ... |
+| `<leader>bT` | Pick the launch target |
+| `<leader>bc` | Clean |
+| `<leader>ba` | Assembly of this file (`:Asm`, below) |
+
+Build errors land in the quickfix (it only opens on error).
+
+### `:Asm` -- a local Compiler Explorer
+
+`:Asm [O0|O1|O2|O3|Os]` (default `O2`, `<leader>ba`) opens the assembly of the
+current C/C++ file in a split: Intel syntax, demangled, without assembler
+directives. It compiles **here** -- nothing goes to godbolt.org -- with the file's
+real flags from `compile_commands.json` when there is one, else plain gcc/g++.
+
+### CUDA
+
+`.cu` files are `cuda`: clangd (through `compile_commands.json` from a CMake
+project with `project(x CXX CUDA)`), treesitter, and `:Asm` / `<leader>ba` shows
+the **PTX** for sm_86 (RTX 3080) via `nvcc`. All of it needs the CUDA Toolkit
+(`nvcc`, headers); without it clangd cannot find `cuda_runtime.h`.
+
+### clangd_extensions.nvim
+
+What the plain LSP client does not expose (C/C++ buffers only):
+
+| Key | Action |
+| --- | --- |
+| `<leader>cH` | Type hierarchy (bases / derived) |
+| `<leader>cT` | AST of the line or selection -- what the compiler sees |
+| `<leader>cS` | Symbol info |
+| `<leader>cM` | clangd's memory usage |
+| `<leader>cs` | Switch source / header |
 
 ## Completion
 
@@ -364,6 +417,10 @@ create by adding a line, then `:w` to apply.
 
 Hidden files are shown. This is the "operate on files" tool; neo-tree is the
 "see the tree" tool.
+
+**Remote files**: oil edits over SSH with no plugin --
+`:Oil oil-ssh://samsung/home/oranos/` opens a directory on a host from
+`~/.ssh/config` (samsung, pi-core, VPS2...), and `:w` writes back over SSH.
 
 Moving or renaming a file here (and in neo-tree) is passed to the LSP
 (`Snacks.rename`, `workspace/willRenameFiles`), so e.g. tsserver rewrites the
@@ -465,8 +522,8 @@ adapter. Flip it to `true` to restore them.
 
 ### autodap.nvim
 
-Zero-config debugging over nvim-dap (a local plugin, resolved from `~/git` via
-lazy's `dev` path, falling back to GitHub).
+Zero-config debugging over nvim-dap (own plugin, installed from GitHub and pinned
+by lazy-lock; add `dev = true` to its spec to run the local `~/git/autodap.nvim`).
 
 | Key | Action |
 | --- | --- |
@@ -512,6 +569,82 @@ Project-wide search and replace in a buffer you edit and then apply.
 
 The panel docks right at 40% width (edgy).
 
+Besides text and regex it has an **ast-grep** engine (switch engine in the panel):
+structural patterns like `foo($A, $B)` → `bar($B, $A)`, safe across hundreds
+of files where a regex is not. Mason installs `ast-grep`.
+
+### cloak.nvim
+
+Masks secret values in `.env*` / `*.env` / `.envrc` files (`KEY=**********`)
+so they do not leak on a shared screen, a recording or a demo.
+
+| Key | Action |
+| --- | --- |
+| `<leader>uk` | Masking on / off |
+| `<leader>uK` | Reveal the cursor line until the cursor moves |
+
+### iron.nvim -- REPL (`<leader>e`)
+
+A Python (IPython when installed) or Node REPL in a right split. Send code to it
+from the buffer; it is a real terminal, so you can also type into it.
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `<leader>er` | n | Open / close the REPL for this filetype |
+| `<leader>el` | n | Send the line |
+| `<leader>es` | x | Send the selection |
+| `<leader>ep` | n | Send the paragraph |
+| `<leader>eb` / `<leader>en` | n | Send the `# %%` cell / and jump to the next |
+| `<leader>ef` | n | Send the whole file |
+| `<leader>em` | n | Send a motion (`<leader>em` + `ip`, `af`...) |
+| `<leader>ei` / `<leader>ec` / `<leader>eq` | n | Interrupt / clear / quit |
+| `<leader>eR` | n | Restart |
+
+### obsidian.nvim -- vault (`<leader>v`)
+
+The Obsidian vault at `~/git/vault` (Forgejo `jarndev/vault`), edited in nvim --
+no Obsidian app needed. Loads only for notes inside the vault.
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `<leader>vo` | n | Open a note (quick switch, fuzzy by title) |
+| `<leader>vs` | n | Search text across the vault |
+| `<leader>vn` | n | New note -- goes to `00-Inbox/`, file name = the title |
+| `<leader>vb` / `<leader>vl` | n | Backlinks to this note / links in it |
+| `<leader>vt` | n | Tags |
+| `<leader>vr` | n | Rename the note, updating every `[[link]]` to it |
+| `<leader>vk` | x | Turn the selection into a link to a new note |
+| `<leader>vT` | n | Every open task (`- [ ]`) across the vault, with preview |
+| `<leader>vc` / `<CR>` | n | Toggle the checkbox on the line |
+
+Type `[[` for link completion (obsidian's own LSP). `gf` / `<CR>` on a link
+follows it. It never rewrites notes: no frontmatter on save, UI layer off
+(render-markdown renders), templates off. Sync is plain git (commit/push the
+vault repo).
+
+### multicursor.nvim
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `<C-Up>` / `<C-Down>` | n, x | Add a cursor above / below |
+| `<leader>n` | n, x | Add a cursor at the next match of the word / selection |
+| `<leader>N` | n, x | Skip this match |
+
+While cursors exist: `<Left>`/`<Right>` hop between them, `<leader>X` deletes
+one, `<Esc>` clears them all. Then edit as usual -- every cursor follows.
+
+### devdocs.nvim -- `<leader>i`
+
+Offline documentation from devdocs.io, read inside Neovim. C and C++
+(cppreference, ~100 MB) download the first time a `<leader>i` key is used.
+
+| Key | Action |
+| --- | --- |
+| `<leader>io` | Open: search an installed doc |
+| `<leader>ii` | Install another doc set (`python~3.12`, `javascript`, `typescript`, `node`...) |
+| `<leader>iv` | Browse the files of a doc set |
+| `<leader>id` | Delete a doc set |
+
 ### overseer.nvim
 
 Task runner with a results list wired into the quickfix.
@@ -540,17 +673,32 @@ notification) -- the on-demand alternative to making the LSP analyse a whole rep
 
 Tests are not here: they are neotest's job (`<leader>t*`).
 
-### kulala.nvim
+### hurl.nvim
 
-An HTTP client: write requests in a `.http` file and run them in place. All keys
-are `http`-filetype only.
+HTTP requests with [Hurl](https://hurl.dev): plain-text `.hurl` files, run in
+place, with asserts -- the same files run in CI as API tests (`hurl --test`).
+Needs the `hurl` binary. All keys are `hurl`-filetype only.
 
 | Key | Action |
 | --- | --- |
 | `<leader>rr` | Run the request under the cursor |
 | `<leader>rR` | Run every request in the file |
-| `<leader>re` | Select the environment |
-| `<leader>ri` | Inspect the request that would be sent |
+| `<leader>re` | Set the env file (variables) |
+| `<leader>ri` | Run verbose (see what is sent) |
+| `<leader>rl` | Show the last response |
+
+```hurl
+GET http://localhost:11434/api/tags
+HTTP 200
+[Asserts]
+jsonpath "$.models" count > 0
+```
+
+Variables: `{{host}}` in the file, values from an env file (`<leader>re`) or
+`hurl --variable host=...`. The response opens in a split.
+
+Replaced kulala.nvim (Oct/2026): its engine became the closed `kulala-core`
+binary behind a license token, and the repo the fork downloaded it from is gone.
 
 ### nvim-lint
 
@@ -704,6 +852,34 @@ error. Verify with `gh auth status`.
 | `<leader>lg` | Lazygit (snacks) |
 | `<leader>gB` | Open the current line/selection on the git host in a browser |
 
+
+### GitHub Projects board (`core/ghproject.lua`)
+
+A Projects (v2) board in a picker, sorted the way the board reads (In Progress,
+In Review, Todo, Done), with Step/Size so typing "P2" or "Todo" filters.
+
+| Key | Action |
+| --- | --- |
+| `<leader>gj` | The board (last project; the first time it asks which) |
+| `<leader>gJ` | Pick another project |
+| `<CR>` (in the picker) | Open the issue/PR in octo (draft: its body) |
+| `<C-s>` | Change the item's Status -- updates the board on GitHub |
+| `<C-o>` | Open in the browser |
+
+gh runs without `$GITHUB_TOKEN` (that token lacks the `project` scope) and uses
+the keyring login.
+
+### Git worktrees (`core/worktree.lua`)
+
+Several branches checked out side by side -- e.g. one per Claude Code session --
+without stashing or switching under each other.
+
+| Key | Action |
+| --- | --- |
+| `<leader>gw` | Pick a worktree and switch (cd, reopen the same file there, LSP restarts) |
+| `<leader>gW` | New worktree for a branch (new or existing) at `../<repo>-<branch>` |
+| `<C-x>` (in the picker) | Remove the worktree (asks; git refuses if it has uncommitted changes) |
+
 ## LSP
 
 ### nvim-lspconfig + mason
@@ -765,6 +941,16 @@ Lua — this is why editing this config gets completion for `vim.api.*`.
 
 No keys. The LSP progress spinner in the bottom right.
 
+
+### Schemas and Terraform
+
+- **SchemaStore.nvim** feeds jsonls and yamlls the schemastore.org catalog:
+  `package.json`, `tsconfig.json`, `docker-compose.yml`, GitHub Actions
+  workflows, Kubernetes manifests, eslint/prettier configs... get completion,
+  hover docs and validation (a wrong key or type is a diagnostic).
+- **Terraform**: `terraform-ls` (LSP), `tflint` (nvim-lint), `terraform fmt`
+  on save (conform), HCL/Terraform treesitter parsers.
+
 ## Testing
 
 ### neotest
@@ -809,6 +995,21 @@ gtest_discover_tests(tests)
 `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug && cmake --build build` once
 (Debug keeps symbols for `<leader>td`).
 
+### nvim-coverage
+
+Covered / uncovered lines in the sign column, from the report the test run wrote.
+
+| Key | Action |
+| --- | --- |
+| `<leader>tc` | Show coverage (first time) / toggle |
+| `<leader>tC` | Summary per file |
+
+| Language | Produce the report with |
+| --- | --- |
+| Jest | `npx jest --coverage` -> `coverage/lcov.info` |
+| pytest | `pytest --cov` (pytest-cov) -> `.coverage`, read through `coverage json` |
+| C/C++ | build with `--coverage -O0`, run the tests, `lcov -c -d build -o report.info` |
+
 ## Treesitter
 
 ### nvim-treesitter (`main` branch)
@@ -850,6 +1051,15 @@ No keys. Closes and renames HTML/JSX tags as you type: type `<div>` and the
 
 ## UI
 
+
+### Presenting / recording
+
+| Key | Action |
+| --- | --- |
+| `<leader>uz` | Zen mode: one centered window, distractions hidden (snacks.zen) |
+| `<leader>uZ` | Zoom the current window (toggle) |
+| `<leader>uv` | Show the keys being pressed in a corner (showkeys) |
+
 ### snacks.nvim
 
 The largest single dependency here — picker, dashboard, terminal, lazygit,
@@ -888,6 +1098,7 @@ live mappings, so it never drifts from the config the way this file can.
 | `<leader>lt` | n | Floating terminal |
 | `<leader>lg` | n | Lazygit |
 | `<leader>ld` | n | Lazydocker |
+| `<leader>lk` | n | k9s (Kubernetes) |
 | `<leader>gB` | n, v | Open the current line on the git host in a browser |
 | `<leader>H` | n | Back to the dashboard |
 
@@ -938,8 +1149,9 @@ Prefixed `gs` so bare `s` stays free for flash.
 
 #### mini.move
 
-Move the selection or line with `<M-D-h/j/k/l>`, reindenting linewise moves.
-(Needs a terminal that sends Meta+Cmd; mostly inert on Linux.)
+Select (`v`/`V`), then `<A-h/j/k/l>` moves the selection, reindenting linewise
+moves. Visual mode only: normal-mode `<A-hjkl>` resizes splits (smart-splits), so
+to move one line use `V` then `<A-j>`/`<A-k>`. On the Mac, the left ⌥.
 
 #### mini.hipatterns
 
@@ -1053,9 +1265,14 @@ need and has no UI of its own.
 
 ### todo-comments.nvim
 
-No keys. Highlights `TODO:`, `FIXME:`, `HACK:`, `NOTE:`, `WARN:`, `PERF:` and
-`TEST:` in comments (signs off, so the gutter stays for git and diagnostics).
-`:TodoTrouble` lists them all, `:TodoQuickFix` sends them to the quickfix.
+Highlights `TODO:`, `FIXME:`, `HACK:`, `NOTE:`, `WARN:`, `PERF:` and `BUG:`
+comments, and makes them navigable.
+
+| Key | Action |
+| --- | --- |
+| `<leader>st` | Every TODO/FIXME in the project (picker with preview) |
+| `<leader>xt` | Same, in trouble |
+| `]t` / `[t` | Next / previous TODO comment |
 
 ### tokyonight.nvim
 

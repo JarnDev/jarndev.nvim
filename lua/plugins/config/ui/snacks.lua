@@ -328,6 +328,28 @@ return {
       desc = '[L]azy[D]ocker',
     },
     {
+      '<leader>lk',
+      function()
+        Snacks.terminal 'k9s'
+      end,
+      desc = '[L]azy [K]9s (Kubernetes)',
+    },
+    -- Zen: one centered window, distractions hidden (presenting, recording, focus)
+    {
+      '<leader>uz',
+      function()
+        Snacks.zen()
+      end,
+      desc = 'UI: [Z]en mode',
+    },
+    {
+      '<leader>uZ',
+      function()
+        Snacks.zen.zoom()
+      end,
+      desc = 'UI: [Z]oom this window (toggle)',
+    },
+    {
       '<leader>lt',
       function()
         Snacks.terminal()

@@ -31,7 +31,8 @@ require('plugins')    -- lazy.setup() with all plugin imports
 ```
 lua/
   bootstrap/          Leader key, Nerd Font flag, lazy.nvim install
-  core/               options.lua, autocommands.lua, ollama.lua (local model pick/load/unload),
+  core/               options.lua, autocommands.lua (+ pt_br/en spell in prose), asm.lua (:Asm),
+                      ollama.lua (local model pick/load/unload),
                       checks.lua (overseer "Check:" tasks: tsc/eslint/pyright/ruff/cmake-make)
   overseer/component/ trouble_qflist.lua (custom overseer component, found on the rtp)
   keymaps/            Global keymaps (window nav, diagnostics, mpv, etc.)
@@ -41,9 +42,10 @@ lua/
       ai/             claudecode.nvim, minuet-ai.nvim
       completion/     blink.cmp
       database/       vim-dadbod, dadbod-ui, dadbod-completion
-      editor/         which-key, autopairs, debug, lint, hover, oil, grug-far, kulala, markdown, sleuth,
+      editor/         which-key, autopairs, debug, lint, hover, oil, grug-far, hurl, markdown, sleuth,
                       harpoon, refactoring, ts-comments, overseer, neogen, dial, yanky, smart-splits
       formatting/     conform.nvim (stylua + prettierd)
+      cpp/            cmake-tools (<leader>b), clangd_extensions
       git/            gitsigns, diffview, octo
       lsp/            nvim-lspconfig + mason stack, neoconf
       terminal/       (empty — handled by snacks.nvim)
@@ -79,7 +81,7 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 - **Symbol outline is `<leader>xs`** (`Trouble symbols`) — aerial.nvim / outline.nvim are deliberately not installed. Trouble also provides `lsp_incoming_calls`, `lsp_outgoing_calls` and a `profiler` mode.
 - **File renames reach the LSP**: oil (`OilActionsPost`) and neo-tree (`file_moved`/`file_renamed`) call `Snacks.rename.on_rename_file`, so tsserver & co. rewrite imports. oil passes `oil://` URLs -- strip the scheme first.
 - **`]]`/`[[` are snacks.words** LSP-reference navigation, bound in `keymaps/init.lua` (snacks enables the module but binds no keys itself).
-- **kulala comes from `mrcjkb/kulala.nvim`, pinned by `commit`** — upstream `mistweaverco/kulala.nvim` went private (404). `submodules = false` is required: the `fmt` submodule points at the also-private `kulala-fmt` and aborts the clone.
+- **HTTP is hurl.nvim + the `hurl` binary** (`.hurl` files, `<leader>r*`). kulala was dropped: its engine became the closed `kulala-core` binary behind a license token (core.kulala.app) and the release repo the fork used is gone.
 
 ### Active Plugin Summary
 
@@ -88,15 +90,24 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 | AI | claudecode.nvim (`<leader>ac*`), minuet (`<leader>al*`), copilot.vim (`<M-l>`) |
 | Completion | blink.cmp (LSP + snippets + copilot + dadbod) |
 | Database | vim-dadbod, dadbod-ui, dadbod-completion |
-| Editor | which-key, nvim-autopairs, nvim-dap+ui (python/C/C++/JS), nvim-lint, hover.nvim, oil.nvim (`-`), grug-far (`<leader>S`), kulala (`<leader>rr`) |
+| Editor | which-key, nvim-autopairs, nvim-dap+ui (python/C/C++/JS), nvim-lint, hover.nvim, oil.nvim (`-`), grug-far (`<leader>S`), hurl (`<leader>rr`) |
 | Navigation | harpoon2 (`<leader>j*`, `<leader>1-4`), smart-splits (`<C-hjkl>` / `<A-hjkl>`), window-picker (`<leader>wp`), flash (`s`/`S`), dropbar breadcrumbs (`<leader>;`), glance (`gld/glr/gli/glt`) |
 | Refactor/Docs | refactoring.nvim (`<leader>cr`), neogen (`<leader>cd`), inc-rename (`<leader>cn`), ts-comments (fixes `gc` in JSX) |
 | Tasks | overseer.nvim (`<leader>o*`) |
-| Editing | yanky (`p`/`P`, `<leader>p`), dial (`<C-a>`/`<C-x>`), mini.ai/surround/move |
+| Editing | yanky (`p`/`P`, `<leader>p`), dial (`<C-a>`/`<C-x>`), mini.ai/surround/move (`<A-hjkl>` on a selection), multicursor (`<C-Up/Down>`, `<leader>n/N`), undotree (`<leader>uu`) |
+| Docs | devdocs offline, C/C++ by default (`<leader>i*`) |
+| REPL | iron.nvim: IPython / node in a split (`<leader>e*`) |
+| Notes | obsidian.nvim on `~/git/vault` (`<leader>v*`): no frontmatter, title = file name, new notes in `00-Inbox` |
+| Git worktrees | `core/worktree.lua` (`<leader>gw` switch, `<leader>gW` new) |
+| GitHub Projects | `core/ghproject.lua` board picker (`<leader>gj`), `<C-s>` sets Status; gh without `$GITHUB_TOKEN` |
+| Tasks | todo-comments (`<leader>st`, `]t`/`[t`), vault checkboxes (`<leader>vT` all open, `<leader>vc` toggle) |
+| Presenting | snacks.zen (`<leader>uz/uZ`), showkeys (`<leader>uv`) |
+| Secrets | cloak.nvim masks `.env*` values (`<leader>uk`, `<leader>uK` reveal line) |
 | Formatting | conform.nvim (`<leader>f`): stylua + prettierd |
 | Git | gitsigns (`<leader>h*`), diffview (`<leader>gd/gh/gH/gc`), octo (`<leader>gp/gi/gr/gO`, needs `gh auth login`) |
-| LSP | nvim-lspconfig + mason + fidget + neoconf (`<leader>cN`) |
-| Testing | neotest: python, jest, ctest for C/C++ (`<leader>tt/tf/ts/to/td`) |
+| LSP | nvim-lspconfig + mason + fidget + neoconf (`<leader>cN`), SchemaStore (json/yaml schemas), terraform-ls + tflint |
+| Testing | neotest: python, jest, ctest for C/C++ (`<leader>tt/tf/ts/to/td`), nvim-coverage (`<leader>tc/tC`) |
+| C/C++/CUDA | cmake-tools (`<leader>b*`), clangd_extensions (`<leader>cH/cT/cS/cM/cs`), `:Asm` local Compiler Explorer (`<leader>ba`; PTX for `.cu`, needs nvcc) |
 | UI | snacks.nvim (dashboard/picker/lazygit/terminal/indent/notifier/scroll/words), trouble (`<leader>xx/xd/xq/xs`), lualine, noice, neo-tree, tokyonight, edgy, smear-cursor, minty (`<leader>uc`), mini.hipatterns |
 
 ## External Dependencies
@@ -110,6 +121,7 @@ System binaries that must be installed separately:
 | `mpv` | Video playback (`<leader>rv`) — launches detached in its own window | `sudo apt install mpv` |
 | `imagemagick` | Dashboard logo as a real image (Snacks.image converts through `magick`/`convert`, even for PNG) | `sudo apt install imagemagick` / `brew install imagemagick` |
 | `chafa` | Dashboard logo fallback as block art (`assets/logo.png`) | `sudo apt install chafa` |
+| `hurl` | HTTP requests (`<leader>r*`) | `brew install hurl` / release tarball from github.com/Orange-OpenSource/hurl |
 | `ollama` | Local model for minuet (`<leader>al*`); can live on another machine via `OLLAMA_API_BASE` | https://ollama.com |
 | `gh` | octo.nvim issues/PR review — needs `gh auth login` | `sudo apt install gh` |
 | `perf` / `valgrind` | Profiling C/C++ (`perf record`, `--tool=callgrind`) | `sudo apt install linux-tools-generic valgrind` |
@@ -228,8 +240,9 @@ inline per-line cost annotations. `:Lazy profile` and `Snacks.profiler` profile
 
 ## Useful In-Editor Commands
 
-- `<leader>?` — `doc/reference.md` in a drawer: Vim builtins + every installed plugin,
-  `<C-f>` fuzzy-jumps inside it. **Keep it in sync when adding or rebinding a plugin** —
+- `<leader>?` — `doc/reference.md` in a drawer: Vim builtins + every installed plugin.
+  Opens folded by heading (`<CR>` opens a section); `s` picks a section with a preview,
+  `<C-f>` fuzzy-jumps lines. **Keep it in sync when adding or rebinding a plugin** —
   it is written from the specs, so a stale entry is worse than a missing one. The live
   source of truth is `<leader>sk` (snacks keymaps), which reads the real mappings.
 - `:Lazy` — plugin manager UI (update, install, profile)

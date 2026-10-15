@@ -1,9 +1,10 @@
 return {
   'folke/noice.nvim',
   event = 'VeryLazy',
+  -- No nvim-notify: noice's notify view prefers snacks.notifier (enabled in snacks.lua),
+  -- so nvim-notify was a fallback that never ran, plus a second vim.notify owner.
   dependencies = {
     'MunifTanjim/nui.nvim',
-    'rcarriga/nvim-notify',
   },
   opts = {
     lsp = {

@@ -10,7 +10,7 @@ return {
   { import = 'plugins.config.editor.hover' },
   { import = 'plugins.config.editor.oil' },
   { import = 'plugins.config.editor.grug-far' },
-  { import = 'plugins.config.editor.kulala' },
+  { import = 'plugins.config.editor.hurl' },
   { import = 'plugins.config.editor.sessions' },
   { import = 'plugins.config.editor.flash' },
   { import = 'plugins.config.editor.inc-rename' },
@@ -23,4 +23,9 @@ return {
   { import = 'plugins.config.editor.yanky' },
   { import = 'plugins.config.editor.smart-splits' },
   { import = 'plugins.config.editor.glance' },
+  { import = 'plugins.config.editor.devdocs' },
+  { import = 'plugins.config.editor.multicursor' },
+  { import = 'plugins.config.editor.cloak' },
+  { import = 'plugins.config.editor.iron' },
+  { import = 'plugins.config.editor.obsidian' },
 }

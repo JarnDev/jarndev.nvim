@@ -1,10 +1,9 @@
--- autodap.nvim -- zero-config debugging over nvim-dap (own plugin, developed in ~/git).
--- `dev = true` resolves it from lazy's `dev.path` instead of cloning; with
--- `dev.fallback` set in plugins/init.lua the same spec still works from GitHub on a
--- machine that has no local checkout.
+-- autodap.nvim -- zero-config debugging over nvim-dap (own plugin). Installed from
+-- GitHub like any other plugin, pinned by lazy-lock. To try local, unpushed changes
+-- from ~/git/autodap.nvim, add `dev = true` here for the session (lazy's `dev.path`
+-- in plugins/init.lua points at ~/git).
 return {
   'JarnDev/autodap.nvim',
-  dev = true,
   dependencies = { 'mfussenegger/nvim-dap' },
   -- Kept lazy on purpose: `defaults.lazy = false` would otherwise load this -- and
   -- drag nvim-dap in with it -- at startup, undoing debug.lua's keys-based laziness.

@@ -22,6 +22,8 @@ return {
         c = { 'clang-format' },
         cpp = { 'clang-format' },
         cmake = { 'cmake_format' },
+        terraform = { 'terraform_fmt' },
+        hcl = { 'terraform_fmt' },
         python = { 'ruff_format', 'ruff_organize_imports' },
         javascript = { 'prettierd' },
         typescript = { 'prettierd' },
