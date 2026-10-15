@@ -28,10 +28,10 @@ return {
   dependencies = { 'nvim-lua/plenary.nvim' },
   event = 'InsertEnter',
   keys = {
-    { '<leader>at', toggle_ai_engine, desc = '[A]I [T]oggle local/copilot' },
-    { '<leader>aw', ollama.ensure_fim, desc = '[A]I [W]arm autocomplete model (reuse loaded or load)' },
-    { '<leader>au', ollama.unload, desc = '[A]I [U]nload local models (free VRAM)' },
-    { '<leader>am', ollama.pick, desc = '[A]I local [M]odel picker' },
+    { '<leader>alt', toggle_ai_engine, desc = 'Autocomplete: Copilot ⇄ local model' },
+    { '<leader>alw', ollama.ensure_fim, desc = 'Warm the model (reuse loaded, else load)' },
+    { '<leader>alu', ollama.unload, desc = 'Unload models from VRAM' },
+    { '<leader>alm', ollama.pick, desc = 'Pick the model' },
   },
   opts = {
     -- Ask the local model for a single completion per request (keeps the 3080 snappy).

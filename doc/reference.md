@@ -16,7 +16,7 @@ Everything this config binds, in one searchable buffer.
 | [Vim Special Keys](#vim-special-keys) | Builtin `[`/`]`, `g`, `z`, operators, marks, registers |
 | [Global Keymaps](#global-keymaps) | `lua/keymaps/init.lua` — not owned by any plugin |
 | [Leader Map](#leader-map) | What each `<leader>` prefix group means |
-| [AI](#ai) | codecompanion, claudecode, minuet |
+| [AI](#ai) | claudecode, minuet (Copilot is under Completion) |
 | [Completion](#completion) | blink.cmp, copilot.vim |
 | [Database](#database) | vim-dadbod + UI + completion |
 | [Editor](#editor) | which-key, dap, oil, harpoon, flash, yanky, dial, ... |
@@ -198,7 +198,7 @@ and wait to see the live menu.
 
 | Prefix | Group |
 | --- | --- |
-| `<leader>a` | AI assistant (codecompanion, claudecode, minuet) |
+| `<leader>a` | AI: `ac` Claude Code, `al` local model (minuet) |
 | `<leader>c` | Code (LSP actions, refactor, docstring, neoconf) |
 | `<leader>d` | Debug (dap) |
 | `<leader>g` | Git (diffview, octo, gitbrowse) |
@@ -220,35 +220,30 @@ and wait to see the live menu.
 
 ## AI
 
-### codecompanion.nvim
+Three different things live under `<leader>a`:
 
-Chat and inline assistant against the Anthropic API. Default model
-`claude-sonnet-4-6`; an `ollama` adapter is configured as a fully local
-alternative. Its model is a chat-capable one already in VRAM if there is one (no
-swap), otherwise the one picked with `<leader>am` (default `qwen2.5-coder:14b`).
+- **Copilot** (copilot.vim, GitHub subscription) and the **local model** (minuet +
+  Ollama) both do the same job: grey ghost-text completions while you type. Only one
+  is active at a time; `<leader>alt` switches.
+- **Claude Code** (claudecode.nvim) is the Claude Code CLI agent -- the same one as in
+  the terminal, on the Claude subscription -- in a Neovim terminal, wired to the
+  buffer, the selection and its proposed diffs.
+
+codecompanion.nvim was removed: its Anthropic adapter needs a paid API key, which
+the Claude subscription does not cover, and Claude Code already does the chat.
+
+### claudecode.nvim -- `<leader>ac`
 
 | Key | Mode | Action |
 | --- | --- | --- |
-| `<leader>aa` | n, v | Toggle chat window |
-| `<leader>ai` | n, v | Inline assistant (edits the buffer in place) |
-| `<leader>ac` | v | Add the visual selection to the chat |
-| `<leader>ap` | n, v | Action palette |
-| `<leader>aL` | n, v | Chat against the **local** Ollama adapter |
+| `<leader>acc` | n | Toggle the Claude Code terminal (`:ClaudeCode`) |
+| `<leader>acf` | n | Focus the Claude Code terminal |
+| `<leader>acs` | v | Send the selection |
+| `<leader>acb` | n | Add the current file |
+| `<leader>aca` / `<leader>acd` | n | Accept / deny the proposed diff |
+| `<leader>acm` | n | Select the model |
 
-Needs `ANTHROPIC_API_KEY` in the environment for the cloud adapter, and a
-running `ollama` for `<leader>aL`. Help: `:h codecompanion`.
-
-### claudecode.nvim
-
-Runs the Claude Code CLI in a Neovim terminal and wires the current buffer /
-selection into it.
-
-| Key | Action |
-| --- | --- |
-| `<leader>aT` | Open the Claude Code terminal (`:ClaudeCode`) |
-| `<leader>af` | Focus the existing Claude Code terminal |
-
-### minuet-ai.nvim
+### minuet-ai.nvim -- `<leader>al`
 
 Local FIM completion via Ollama (`qwen2.5-coder:14b` at `$OLLAMA_API_BASE`,
 default `localhost:11434`). Deliberately **off** by default so it never fights
@@ -256,22 +251,22 @@ copilot.vim's ghost text.
 
 | Key | Mode | Action |
 | --- | --- | --- |
-| `<leader>at` | n | Toggle ghost-text engine: Copilot ⇄ local Ollama (switching to local warms the model) |
-| `<leader>aw` | n | Warm the autocomplete model: reuse a loaded FIM model, else load it |
-| `<leader>au` | n | Unload every model from VRAM now |
-| `<leader>am` | n | Pick a local model (● loaded · autocomplete + chat / chat only · does not fit VRAM) |
+| `<leader>alt` | n | Autocomplete engine: Copilot ⇄ local model (switching to local warms the model) |
+| `<leader>alw` | n | Warm the model: reuse a loaded FIM model, else load it |
+| `<leader>alu` | n | Unload every model from VRAM now |
+| `<leader>alm` | n | Pick the autocomplete model (★ in use · ● loaded · does not fit VRAM) |
 | `<A-y>` | i | Accept the suggestion *(local engine on)* |
 | `<A-Y>` | i | Accept one line |
 | `<A-[>` / `<A-]>` | i | Previous / next suggestion |
 | `<A-e>` | i | Dismiss |
 
-`<leader>at` flips `vim.g.ai_engine_local`, which also decides whether blink.cmp
+`<leader>alt` flips `vim.g.ai_engine_local`, which also decides whether blink.cmp
 queries the `minuet` source — so when it is off, nothing hits localhost on every
 keystroke. Budget: 1 completion per request, 64 tokens, 5s timeout.
 
 Model handling lives in `lua/core/ollama.lua`. Only models with Ollama's `insert`
 capability can do fill-in-the-middle (here just `qwen2.5-coder:14b`); the others
-can only chat. A cold load takes ~35-60s, past the 5s timeout, hence the warm-up;
+can only chat, so the picker refuses them. A cold load takes ~35-60s, past the 5s timeout, hence the warm-up;
 loads use `keep_alive = 15m`. The pick lasts for the session.
 
 ## Completion
@@ -305,7 +300,7 @@ Inline ghost text from GitHub Copilot, and a blink source (scored above LSP at
 
 `<Tab>` belongs to blink, so `copilot_no_tab_map` is set and `<M-l>` is the
 accept key. Run `:Copilot setup` once. Toggle it off in favour of the local
-model with `<leader>at`.
+model with `<leader>alt`.
 
 ## Database
 

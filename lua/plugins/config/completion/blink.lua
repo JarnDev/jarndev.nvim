@@ -29,7 +29,7 @@ return {
       accept = { auto_brackets = { enabled = true } },
     },
     sources = {
-      -- minuet (Ollama) is only queried when the local engine is toggled on (<leader>at),
+      -- minuet (Ollama) is only queried when the local engine is toggled on (<leader>alt),
       -- otherwise every keystroke would hit localhost:11434.
       default = function()
         local sources = { 'lsp', 'path', 'snippets', 'buffer', 'copilot' }

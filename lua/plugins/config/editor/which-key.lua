@@ -37,7 +37,9 @@ return {
       },
     },
     spec = {
-      { '<leader>a', group = '[A]I Assistant', mode = { 'n', 'v' } },
+      { '<leader>a', group = '[A]I', mode = { 'n', 'v' } },
+      { '<leader>ac', group = '[C]laude Code (agent, subscription)', mode = { 'n', 'v' } },
+      { '<leader>al', group = '[L]ocal model (Ollama autocomplete)' },
       { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
       { '<leader>d', group = '[D]ebug' },
       { '<leader>g', group = '[G]it' },

@@ -188,10 +188,11 @@ plugin, with `<C-f>` to fuzzy-jump inside it.
 
 | Key | Action |
 | --- | --- |
-| `<leader>aa` `<leader>ai` `<leader>ap` | CodeCompanion chat / inline / action palette |
-| `<leader>ac` (visual) · `<leader>aL` | Add selection to chat · local Ollama chat |
-| `<leader>aT` · `<leader>af` | Claude Code terminal · focus |
-| `<leader>at` | Toggle ghost text: Copilot ↔ local Ollama |
+| `<leader>acc` · `<leader>acf` | Claude Code terminal · focus |
+| `<leader>acs` (visual) · `<leader>acb` | Send selection · add current file to Claude Code |
+| `<leader>aca` · `<leader>acd` | Accept · deny Claude Code's proposed diff |
+| `<leader>alt` | Toggle ghost text: Copilot ↔ local Ollama |
+| `<leader>alm` · `<leader>alw` · `<leader>alu` | Local model: pick · warm · unload |
 | `<M-l>` (insert) | Accept Copilot suggestion |
 
 ### Editing and UI
@@ -228,7 +229,7 @@ why it was chosen and how to use it. The table below is the inventory.
 | **Linting** | nvim-lint — ruff, eslint_d, markdownlint-cli2, shellcheck |
 | **Database** | vim-dadbod + dadbod-ui + dadbod-completion |
 | **HTTP** | kulala.nvim |
-| **AI** | claudecode.nvim, codecompanion.nvim, copilot.vim, minuet-ai (Ollama) |
+| **AI** | claudecode.nvim, copilot.vim, minuet-ai (Ollama) |
 | **UI** | tokyonight, lualine, noice + nvim-notify, trouble, todo-comments, edgy, smear-cursor, minty/menu, which-key, vim-startuptime |
 
 Language servers configured: `lua_ls`, `ts_ls`, `eslint`, `jsonls`, `html`, `cssls`,

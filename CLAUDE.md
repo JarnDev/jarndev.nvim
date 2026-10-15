@@ -36,7 +36,7 @@ lua/
   plugins/
     init.lua          lazy.setup() — imports all config categories
     config/
-      ai/             codecompanion.nvim, claudecode.nvim
+      ai/             claudecode.nvim, minuet-ai.nvim
       completion/     blink.cmp
       database/       vim-dadbod, dadbod-ui, dadbod-completion
       editor/         which-key, autopairs, debug, lint, hover, oil, grug-far, kulala, markdown, sleuth,
@@ -62,7 +62,7 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 - **Dashboard**: snacks.nvim dashboard (not dashboard-nvim). Configured in `lua/plugins/config/ui/snacks.lua`.
 - **Terminal/Lazygit**: snacks.nvim terminal/lazygit (`<leader>lg/ld/lt`), not toggleterm or kdheepak/lazygit.
 - **Statusline**: lualine.nvim (mini.statusline is disabled in mini.lua).
-- **AI**: claudecode.nvim (CLI terminal integration) + codecompanion.nvim (Anthropic API chat/inline). copilot.vim stays for ghost-text completions.
+- **AI**: claudecode.nvim (Claude Code CLI in a terminal, `<leader>ac`) + minuet (local Ollama FIM, `<leader>al`, model handling in `core/ollama.lua`). copilot.vim stays for ghost-text completions. codecompanion was removed: its Anthropic adapter needs a paid API key the Claude subscription does not cover.
 - **Hover**: hover.nvim (`K` = hover, `gK` = select provider). Configured in `lua/plugins/config/editor/hover.lua`.
 - **Terminal**: kitty from the upstream installer (`os-custom-config/linux/install-kitty.sh`); the Ubuntu apt kitty 0.32.2 doubles Backspace/Enter under KKP (fixed in 0.33). No Neovim-side workaround is needed.
 - **LSP servers**: configured with `vim.lsp.config()` in `lspconfig.lua`; mason-lspconfig v2 auto-enables installed servers (`automatic_enable.exclude` keeps stylua/ruff/eslint_d as tools only).
@@ -82,7 +82,7 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 
 | Category | Key Plugins |
 |----------|-------------|
-| AI | codecompanion.nvim (`<leader>aa/ai/ac/ap/aL`), claudecode.nvim (`<leader>aT/af`), minuet (`<leader>at/aw/au/am`) |
+| AI | claudecode.nvim (`<leader>ac*`), minuet (`<leader>al*`), copilot.vim (`<M-l>`) |
 | Completion | blink.cmp (LSP + snippets + copilot + dadbod) |
 | Database | vim-dadbod, dadbod-ui, dadbod-completion |
 | Editor | which-key, nvim-autopairs, nvim-dap+ui (python/C/C++/JS), nvim-lint, hover.nvim, oil.nvim (`-`), grug-far (`<leader>S`), kulala (`<leader>rr`) |
@@ -107,7 +107,7 @@ System binaries that must be installed separately:
 | `mpv` | Video playback (`<leader>rv`) — launches detached in its own window | `sudo apt install mpv` |
 | `imagemagick` | Dashboard logo as a real image (Snacks.image converts through `magick`/`convert`, even for PNG) | `sudo apt install imagemagick` / `brew install imagemagick` |
 | `chafa` | Dashboard logo fallback as block art (`assets/logo.png`) | `sudo apt install chafa` |
-| `ollama` | Local models for minuet / codecompanion (`<leader>at`, `<leader>aL`) | https://ollama.com |
+| `ollama` | Local model for minuet (`<leader>al*`); can live on another machine via `OLLAMA_API_BASE` | https://ollama.com |
 | `gh` | octo.nvim issues/PR review — needs `gh auth login` | `sudo apt install gh` |
 | `perf` / `valgrind` | Profiling C/C++ (`perf record`, `--tool=callgrind`) | `sudo apt install linux-tools-generic valgrind` |
 
