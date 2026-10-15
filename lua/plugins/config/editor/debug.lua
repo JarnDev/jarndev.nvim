@@ -14,11 +14,21 @@ return {
     local dap = require 'dap'
     local dapui = require 'dapui'
 
+    -- autodap.nvim (editor/autodap.lua) owns every dap adapter and configuration while
+    -- this is false, so <F5> / <leader>dc go through the plugin alone.
+    -- It has to be this way round -- autodap's register() bails on any adapter name that
+    -- is already taken, and both mason-nvim-dap's default handlers and the blocks at the
+    -- bottom of this file would claim python / pwa-node / codelldb first.
+    -- Flip to true to fall back to this file's hand-written setup.
+    local hand_written_configs = false
+
     require('nvim-dap-virtual-text').setup()
     require('dapui').setup()
     require('mason-nvim-dap').setup {
-      automatic_setup = true,
-      handlers = {},
+      -- `handlers = {}` routes every installed debugger through default_setup, which
+      -- registers an adapter *and* configurations for it. nil (the plugin's own default)
+      -- leaves registration alone; ensure_installed below is unaffected either way.
+      handlers = hand_written_configs and {} or nil,
       ensure_installed = {
         'python',
         'codelldb',
@@ -36,6 +46,10 @@ return {
     vim.keymap.set('n', '<leader>dl', dap.run_last, { desc = 'Run Last' })
     vim.keymap.set('n', '<leader>du', dapui.toggle, { desc = 'Toggle Debug UI' })
     vim.keymap.set('n', '<leader>dt', dap.terminate, { desc = 'Terminate' })
+
+    if not hand_written_configs then
+      return
+    end
 
     -- Python configuration
     dap.adapters.python = {

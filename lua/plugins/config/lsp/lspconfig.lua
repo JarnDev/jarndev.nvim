@@ -164,6 +164,7 @@ return {
         'markdownlint-cli2',
         'prettierd',
         'eslint_d',
+        'ruff', -- conform (ruff_format/organize_imports) + nvim-lint for python
         'tree-sitter-cli',
         'shellcheck', -- bashls only emits diagnostics through shellcheck
         'clang-format',

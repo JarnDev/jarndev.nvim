@@ -5,6 +5,7 @@ return {
   { import = 'plugins.config.editor.markdown' },
   { import = 'plugins.config.editor.markdown-preview' },
   { import = 'plugins.config.editor.debug' },
+  { import = 'plugins.config.editor.autodap' },
   { import = 'plugins.config.editor.lint' },
   { import = 'plugins.config.editor.hover' },
   { import = 'plugins.config.editor.oil' },

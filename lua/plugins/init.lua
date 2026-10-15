@@ -64,6 +64,14 @@ require('lazy').setup {
     lazy = false,
     version = false,
   },
+  -- Plugins developed locally: `dev = true` in a spec resolves the repo from here
+  -- instead of cloning it, so edits land on the next restart. `fallback` keeps the
+  -- same spec working on a machine where the checkout does not exist -- lazy clones
+  -- it from GitHub instead of erroring.
+  dev = {
+    path = '~/git',
+    fallback = true,
+  },
   install = {
     colorscheme = { 'tokyonight-night' },
   },
