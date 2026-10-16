@@ -31,7 +31,7 @@ return {
     { '<leader>alt', toggle_ai_engine, desc = 'Autocomplete: Copilot ⇄ local model' },
     { '<leader>alw', ollama.ensure_fim, desc = 'Warm the model (reuse loaded, else load)' },
     { '<leader>alu', ollama.unload, desc = 'Unload models from VRAM' },
-    { '<leader>alm', ollama.pick, desc = 'Pick the model' },
+    { '<leader>alm', ollama.pick, desc = 'Pick the model (chat; autocomplete when it can)' },
   },
   opts = {
     -- Ask the local model for a single completion per request (keeps the 3080 snappy).

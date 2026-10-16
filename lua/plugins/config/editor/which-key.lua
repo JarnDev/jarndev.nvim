@@ -39,7 +39,7 @@ return {
     spec = {
       { '<leader>a', group = '[A]I', mode = { 'n', 'v' } },
       { '<leader>ac', group = '[C]laude Code (agent, subscription)', mode = { 'n', 'v' } },
-      { '<leader>al', group = '[L]ocal model (Ollama autocomplete)' },
+      { '<leader>al', group = '[L]ocal model (Ollama chat + autocomplete)', mode = { 'n', 'v' } },
       { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
       { '<leader>d', group = '[D]ebug' },
       { '<leader>D', group = '[D]atabase (dadbod)' },

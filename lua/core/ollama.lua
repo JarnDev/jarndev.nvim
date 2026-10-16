@@ -1,12 +1,12 @@
--- Local Ollama models for minuet (FIM autocomplete).
+-- Local Ollama models for minuet (FIM autocomplete) and codecompanion (local chat).
 --
 -- Which model is loaded matters: the 3080 has 10 GB, so one model at a time, and a cold
 -- load takes ~35-60s (minuet gives up after 5s). So prefer whatever is already in VRAM,
 -- and only load when needed.
 --
 -- Not every model can autocomplete: minuet asks for fill-in-the-middle, which Ollama
--- reports as the `insert` capability (only qwen2.5-coder here). The others can only chat,
--- which nothing in this config uses since codecompanion was dropped.
+-- reports as the `insert` capability (only qwen2.5-coder here). Everything with
+-- `completion` can chat; `embedding`-only models can do neither.
 --
 -- The choice lasts for the nvim session. OLLAMA_API_BASE (zshrc) points other machines
 -- (the Mac) at the GPU box; unset means this machine.
@@ -14,6 +14,7 @@ local M = {}
 
 M.base = vim.env.OLLAMA_API_BASE or 'http://localhost:11434'
 M.fim_model = 'qwen2.5-coder:14b' -- autocomplete (needs `insert`)
+M.chat_model = 'qwen3:8b' -- codecompanion local chat (the general default)
 M.keep_alive = '15m' -- warm for a working session, without pinning the GPU
 -- VRAM of the Ollama host (RTX 3080). The API does not report it, and from the Mac
 -- nvidia-smi is not even there; used only to flag models that will spill into RAM.
@@ -152,8 +153,18 @@ function M.ensure_fim()
   M.load(M.fim_model)
 end
 
---- Pick the autocomplete model among the installed ones (only FIM-capable ones apply),
---- then load it.
+--- Local chat: a loaded chat-capable model if any (no swap), else the chosen one.
+function M.chat_model_now()
+  for _, name in ipairs(M.loaded()) do
+    if M.can_chat(name) then
+      return name
+    end
+  end
+  return M.chat_model
+end
+
+--- Pick any installed model: becomes the chat model, and the autocomplete one when it
+--- can do FIM; then it is loaded.
 function M.pick()
   local models, err = M.tags()
   if not models then
@@ -164,12 +175,15 @@ function M.pick()
     return a.name < b.name
   end)
   vim.ui.select(models, {
-    prompt = 'Modelo do autocomplete (' .. M.base .. ')',
+    prompt = 'Modelo local (' .. M.base .. ')',
     format_item = function(m)
-      local role = M.can_fim(m.name) and 'autocomplete' or M.can_chat(m.name) and 'sem FIM (só chat)' or 'embedding'
+      local role = M.can_fim(m.name) and 'chat + autocomplete' or M.can_chat(m.name) and 'só chat' or 'embedding'
       local flags = {}
+      if m.name == M.chat_model then
+        table.insert(flags, '★ chat')
+      end
       if m.name == M.fim_model then
-        table.insert(flags, '★ em uso')
+        table.insert(flags, '★ autocomplete')
       end
       if vim.tbl_contains(loaded, m.name) then
         table.insert(flags, '● carregado')
@@ -177,17 +191,22 @@ function M.pick()
       if m.size > M.vram_bytes * 0.95 then
         table.insert(flags, 'não cabe na VRAM (lento)')
       end
-      return ('%-28s %5.1f GB  %-18s %s'):format(m.name, m.size / 1024 ^ 3, role, table.concat(flags, ' · '))
+      return ('%-28s %5.1f GB  %-19s %s'):format(m.name, m.size / 1024 ^ 3, role, table.concat(flags, ' · '))
     end,
   }, function(m)
     if not m then
       return
     end
-    if not M.can_fim(m.name) then
-      return notify(m.name .. ' não faz fill-in-the-middle; o autocomplete segue em ' .. M.fim_model, vim.log.levels.WARN)
+    if not M.can_chat(m.name) then
+      return notify(m.name .. ' não gera texto (embedding)', vim.log.levels.WARN)
     end
-    set_minuet_model(m.name)
-    notify('autocomplete → ' .. m.name)
+    M.chat_model = m.name
+    if M.can_fim(m.name) then
+      set_minuet_model(m.name)
+      notify(m.name .. ' → chat e autocomplete')
+    else
+      notify(('%s → chat; autocomplete segue em %s (este não faz fill-in-the-middle)'):format(m.name, M.fim_model))
+    end
     if not vim.tbl_contains(loaded, m.name) then
       M.load(m.name)
     end

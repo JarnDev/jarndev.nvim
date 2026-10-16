@@ -32,7 +32,7 @@ require('plugins')    -- lazy.setup() with all plugin imports
 lua/
   bootstrap/          Leader key, Nerd Font flag, lazy.nvim install
   core/               options.lua, autocommands.lua (+ pt_br/en spell in prose), asm.lua (:Asm),
-                      ollama.lua (local model pick/load/unload),
+                      ollama.lua (local model pick/load/unload, chat + FIM),
                       checks.lua (overseer "Check:" tasks: tsc/eslint/pyright/ruff/cmake-make)
   overseer/component/ trouble_qflist.lua (custom overseer component, found on the rtp)
   keymaps/            Global keymaps (window nav, diagnostics, mpv, etc.)
@@ -66,7 +66,7 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 - **Dashboard**: snacks.nvim dashboard (not dashboard-nvim). Configured in `lua/plugins/config/ui/snacks.lua`.
 - **Terminal/Lazygit**: snacks.nvim terminal/lazygit (`<leader>lg/ld/lt`), not toggleterm or kdheepak/lazygit.
 - **Statusline**: lualine.nvim (mini.statusline is disabled in mini.lua).
-- **AI**: claudecode.nvim (Claude Code CLI in a terminal, `<leader>ac`) + minuet (local Ollama FIM, `<leader>al`, model handling in `core/ollama.lua`). copilot.vim stays for ghost-text completions. codecompanion was removed: its Anthropic adapter needs a paid API key the Claude subscription does not cover.
+- **AI**: claudecode.nvim (Claude Code CLI in a terminal, `<leader>ac`) + local Ollama under `<leader>al`: sidekick.nvim hosting the Pi agent (chat, right pane; Pi config in `~/.pi/agent`), codecompanion (inline) and minuet (FIM), model handling in `core/ollama.lua`. copilot.vim stays for ghost-text completions. codecompanion is Ollama-only: its Anthropic adapter needs a paid API key the Claude subscription does not cover.
 - **Hover**: hover.nvim (`K` = hover, `gK` = select provider). Configured in `lua/plugins/config/editor/hover.lua`.
 - **Terminal**: kitty from the upstream installer (`os-custom-config/linux/install-kitty.sh`); the Ubuntu apt kitty 0.32.2 doubles Backspace/Enter under KKP (fixed in 0.33). No Neovim-side workaround is needed.
 - **LSP servers**: configured with `vim.lsp.config()` in `lspconfig.lua`; mason-lspconfig v2 auto-enables installed servers (`automatic_enable.exclude` keeps stylua/ruff/eslint_d as tools only).
@@ -87,7 +87,7 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 
 | Category | Key Plugins |
 |----------|-------------|
-| AI | claudecode.nvim (`<leader>ac*`), minuet (`<leader>al*`), copilot.vim (`<M-l>`) |
+| AI | claudecode.nvim (`<leader>ac*`), sidekick (Pi) + codecompanion + minuet (`<leader>al*`), copilot.vim (`<M-l>`) |
 | Completion | blink.cmp (LSP + snippets + copilot + dadbod) |
 | Database | vim-dadbod, dadbod-ui (`<leader>D*`), dadbod-completion |
 | Editor | which-key, nvim-autopairs, nvim-dap+ui (python/C/C++/JS), nvim-lint, hover.nvim, oil.nvim (`-`), grug-far (`<leader>S`), hurl (`<leader>rr`) |
@@ -122,7 +122,8 @@ System binaries that must be installed separately:
 | `imagemagick` | Dashboard logo as a real image (Snacks.image converts through `magick`/`convert`, even for PNG) | `sudo apt install imagemagick` / `brew install imagemagick` |
 | `chafa` | Dashboard logo fallback as block art (`assets/logo.png`) | `sudo apt install chafa` |
 | `hurl` | HTTP requests (`<leader>r*`) | `brew install hurl` / release tarball from github.com/Orange-OpenSource/hurl |
-| `ollama` | Local model for minuet (`<leader>al*`); can live on another machine via `OLLAMA_API_BASE` | https://ollama.com |
+| `pi` | Local agent in the right pane (`<leader>alc`); config in `~/.pi/agent` | `npm install -g --ignore-scripts @earendil-works/pi-coding-agent` |
+| `ollama` | Local model for Pi, codecompanion and minuet (`<leader>al*`); can live on another machine via `OLLAMA_API_BASE` | https://ollama.com |
 | `gh` | octo.nvim issues/PR review — needs `gh auth login` | `sudo apt install gh` |
 | `perf` / `valgrind` | Profiling C/C++ (`perf record`, `--tool=callgrind`) | `sudo apt install linux-tools-generic valgrind` |
 

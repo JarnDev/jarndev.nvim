@@ -72,6 +72,15 @@ return {
           return is_claude(buf) and not is_float(win)
         end,
       },
+      -- sidekick.nvim (Pi, the local agent) opens on the right too
+      {
+        ft = 'sidekick_terminal',
+        title = 'Pi (local)',
+        size = { width = 0.3 },
+        filter = function(_, win)
+          return not is_float(win)
+        end,
+      },
     },
     -- Never dock the dashboard or the AI chat panes.
     options = { left = { size = 34 }, bottom = { size = 12 }, right = { size = 50 } },

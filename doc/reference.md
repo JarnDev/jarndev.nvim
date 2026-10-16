@@ -201,7 +201,7 @@ and wait to see the live menu.
 
 | Prefix | Group |
 | --- | --- |
-| `<leader>a` | AI: `ac` Claude Code, `al` local model (minuet) |
+| `<leader>a` | AI: `ac` Claude Code, `al` local model (Pi agent, inline edits, autocomplete) |
 | `<leader>b` | Build: CMake (cmake-tools) + `:Asm` |
 | `<leader>c` | Code (LSP actions, refactor, docstring, neoconf) |
 | `<leader>d` | Debug (dap) |
@@ -229,7 +229,7 @@ and wait to see the live menu.
 
 ## AI
 
-Three different things live under `<leader>a`:
+Four different things live under `<leader>a`:
 
 - **Copilot** (copilot.vim, GitHub subscription) and the **local model** (minuet +
   Ollama) both do the same job: grey ghost-text completions while you type. Only one
@@ -237,9 +237,11 @@ Three different things live under `<leader>a`:
 - **Claude Code** (claudecode.nvim) is the Claude Code CLI agent -- the same one as in
   the terminal, on the Claude subscription -- in a Neovim terminal, wired to the
   buffer, the selection and its proposed diffs.
+- **Local agent** (Pi in sidekick.nvim) and **local inline edits** (codecompanion.nvim),
+  both against Ollama on your own GPU. Free and offline, much weaker than Claude.
 
-codecompanion.nvim was removed: its Anthropic adapter needs a paid API key, which
-the Claude subscription does not cover, and Claude Code already does the chat.
+codecompanion only talks to Ollama here: its Anthropic adapter needs a paid API key,
+which the Claude subscription does not cover.
 
 ### claudecode.nvim -- `<leader>ac`
 
@@ -255,6 +257,54 @@ of its own -- edgy docks every other snacks terminal at the bottom).
 | `<leader>aca` / `<leader>acd` | n | Accept / deny the proposed diff |
 | `<leader>acm` | n | Select the model |
 
+### Pi (sidekick.nvim) -- local agent, `<leader>al`
+
+[Pi](https://github.com/earendil-works/pi) is a minimal terminal agent in the style of
+Claude Code (read-only transcript, input box at the bottom, tools: read / write / edit /
+bash). sidekick.nvim runs it in a terminal docked on the right at 30%, like Claude Code,
+and sends context to it. sidekick's Copilot "next edit suggestions" are off.
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `<leader>alc` | n, x | Toggle the Pi pane (focuses it) |
+| `<leader>als` | x | Send the selection to Pi |
+| `<leader>alf` | n | Send the current file |
+| `<leader>ald` | n | Send the current file's diagnostics |
+| `<leader>ala` | n, x | Pick a ready prompt (explain, fix, tests, review...) |
+
+Inside the pane: `<C-p>` cycles models, `/model` picks one, `/thinking` sets the
+thinking level, `<C-.>` hides the pane, `<C-q>` leaves terminal mode.
+
+Pi's config is outside this repo, in `~/.pi/agent`:
+
+- `models.json` -- Ollama at `localhost:11434`, models with `contextWindow` 8192 to
+  match the container's `OLLAMA_CONTEXT_LENGTH` (raising it is global and slows the
+  default `qwen3:8b` ~4x, measured 16/10/2026).
+- `settings.json` -- `qwen3:8b`, thinking off, compaction reserve sized for 8k, install
+  telemetry off.
+- `extensions/confirm.ts` -- Pi has **no permission system**: this asks before every
+  bash command and before writes outside the project.
+
+sidekick starts it as `pi -nc`: no `AGENTS.md` / `CLAUDE.md`, which are written for
+Claude Code and would fill the 8k context. An 8B model can claim it ran something it
+did not -- check the tool lines in the transcript.
+
+### codecompanion.nvim -- local inline edits, `<leader>al`
+
+Inline assistant against the same Ollama as minuet (`$OLLAMA_API_BASE`, default
+`localhost:11434`). The model is a chat-capable one already in VRAM if there is one (no
+swap, no 35-60s cold load), otherwise the one picked with `<leader>alm` (default
+`qwen3:8b`).
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `<leader>ali` | n, v | Inline assistant (edits the buffer in place; asks for the prompt) |
+| `<leader>alp` | n, v | Action palette (explain, fix, tests, ...) |
+| `<leader>alC` | n, v | Markdown chat buffer (`<C-s>` sends, `<C-c>` closes, `ga` model) |
+
+Rules files (`CLAUDE.md`, `AGENTS.md`, ...) are **not** auto-attached, for the same
+reason as Pi's `-nc`. Help: `:h codecompanion`.
+
 ### minuet-ai.nvim -- `<leader>al`
 
 Local FIM completion via Ollama (`qwen2.5-coder:14b` at `$OLLAMA_API_BASE`,
@@ -266,7 +316,7 @@ copilot.vim's ghost text.
 | `<leader>alt` | n | Autocomplete engine: Copilot ⇄ local model (switching to local warms the model) |
 | `<leader>alw` | n | Warm the model: reuse a loaded FIM model, else load it |
 | `<leader>alu` | n | Unload every model from VRAM now |
-| `<leader>alm` | n | Pick the autocomplete model (★ in use · ● loaded · does not fit VRAM) |
+| `<leader>alm` | n | Pick the model: chat, and autocomplete too when it can do FIM (★ in use · ● loaded · does not fit VRAM) |
 | `<A-y>` | i | Accept the suggestion *(local engine on)* |
 | `<A-Y>` | i | Accept one line |
 | `<A-[>` / `<A-]>` | i | Previous / next suggestion |
@@ -278,7 +328,7 @@ keystroke. Budget: 1 completion per request, 64 tokens, 5s timeout.
 
 Model handling lives in `lua/core/ollama.lua`. Only models with Ollama's `insert`
 capability can do fill-in-the-middle (here just `qwen2.5-coder:14b`); the others
-can only chat, so the picker refuses them. A cold load takes ~35-60s, past the 5s timeout, hence the warm-up;
+can only chat, so picking one changes just the chat model. A cold load takes ~35-60s, past the 5s timeout, hence the warm-up;
 loads use `keep_alive = 15m`. The pick lasts for the session.
 
 ## C/C++
