@@ -10,6 +10,21 @@ local function cli()
   return require 'sidekick.cli'
 end
 
+-- `git diff` of the buffer's repo, capped: a long diff would eat the 8k context
+local function git_diff(args)
+  return function(ctx)
+    local out = vim.fn.systemlist(vim.list_extend({ 'git', '-C', ctx.cwd, 'diff', '--no-color' }, args))
+    if vim.v.shell_error ~= 0 or #out == 0 then
+      return false
+    end
+    if #out > 150 then
+      out = vim.list_slice(out, 1, 150)
+      table.insert(out, '[diff truncated at 150 lines]')
+    end
+    return { '```diff', unpack(vim.list_extend(out, { '```' })) }
+  end
+end
+
 local function send(msg)
   return function()
     cli().send { name = 'pi', msg = msg }
@@ -55,6 +70,22 @@ return {
         -- -nc: no AGENTS.md / CLAUDE.md -- written for Claude Code, and they would
         -- fill the 8k context
         pi = { cmd = { 'pi', '-nc' } },
+      },
+      -- extra ready prompts for <leader>ala, next to the built-in ones (explain, fix,
+      -- tests, review...). The diff ones carry the diff, so Pi needs no confirmed bash.
+      context = {
+        git_diff = git_diff { 'HEAD' },
+        git_staged = git_diff { '--cached' },
+      },
+      prompts = {
+        changes = 'Review these uncommitted changes for bugs and leftovers:\n{git_diff}',
+        commit = 'Write a conventional commit message (subject up to 72 chars, then a short body) for:\n{git_staged}',
+        simplify = 'Simplify {this} without changing its behavior',
+        names = 'Suggest clearer names for the variables and functions in {this}',
+        edge_cases = 'Which inputs or edge cases does {this} handle wrong? Be specific',
+        errors = 'Add error handling to {this}, in the style of the rest of the file',
+        types = 'Add type annotations to {this}',
+        pt = 'Explique {this} em português, de forma curta',
       },
     },
   },

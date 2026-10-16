@@ -275,6 +275,18 @@ and sends context to it. sidekick's Copilot "next edit suggestions" are off.
 Inside the pane: `<C-p>` cycles models, `/model` picks one, `/thinking` sets the
 thinking level, `<C-.>` hides the pane, `<C-q>` leaves terminal mode.
 
+Ready prompts (`<leader>ala`): sidekick's built-ins (`explain`, `fix`, `optimize`,
+`review`, `tests`, `document`, `diagnostics`...) plus these, in `sidekick.lua`:
+
+| Prompt | Sends |
+| --- | --- |
+| `changes` | the uncommitted diff (`git diff HEAD`) asking for a review -- replaces the built-in, which sent no diff |
+| `commit` | the staged diff, asking for a conventional commit message (nothing staged: nothing sent) |
+| `simplify` / `names` / `edge_cases` / `errors` / `types` | `{this}` (selection, or the cursor position) with that request |
+| `pt` | `{this}`, explained in Portuguese |
+
+Diffs are cut at 150 lines so they fit the 8k context.
+
 Pi's config is outside this repo, in `~/.pi/agent`:
 
 - `models.json` -- Ollama at `localhost:11434`, models with `contextWindow` 8192 to
