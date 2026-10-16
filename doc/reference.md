@@ -281,7 +281,7 @@ Ready prompts (`<leader>ala`): sidekick's built-ins (`explain`, `fix`, `optimize
 | Prompt | Sends |
 | --- | --- |
 | `changes` | the uncommitted diff (`git diff HEAD`) asking for a review -- replaces the built-in, which sent no diff |
-| `commit` | the staged diff, asking for a conventional commit message (nothing staged: nothing sent) |
+| `commit` | the staged diff, or every uncommitted change when nothing is staged, asking for a conventional commit message |
 | `simplify` / `names` / `edge_cases` / `errors` / `types` | `{this}` (selection, or the cursor position) with that request |
 | `pt` | `{this}`, explained in Portuguese |
 

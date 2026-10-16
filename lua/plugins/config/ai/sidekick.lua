@@ -90,7 +90,7 @@ return {
       },
       prompts = {
         changes = 'Review these uncommitted changes for bugs and leftovers:\n{git_diff}',
-        commit = 'Write a conventional commit message (subject up to 72 chars, then a short body) for:\n{git_staged}',
+        commit = 'Write a conventional commit message (subject up to 72 chars, then a short body) for:\n{git_staged|git_diff}',
         simplify = 'Simplify {this} without changing its behavior',
         names = 'Suggest clearer names for the variables and functions in {this}',
         edge_cases = 'Which inputs or edge cases does {this} handle wrong? Be specific',
