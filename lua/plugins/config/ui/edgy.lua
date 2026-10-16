@@ -12,7 +12,8 @@ local function is_claude(buf)
 end
 
 -- edgy turns a floating window that matches a slot into a split. lazygit, lazydocker
--- and k9s are snacks terminals in a float, so the terminal slots skip floats.
+-- and k9s are snacks terminals in a float, so the terminal slots skip floats (so does
+-- trouble's, for its preview).
 local function is_float(win)
   return vim.api.nvim_win_get_config(win).relative ~= ''
 end
@@ -35,7 +36,15 @@ return {
     wo = { winbar = false },
     bottom = {
       { ft = 'qf', title = 'QuickFix' },
-      { ft = 'trouble', size = { height = 0.35 } },
+      {
+        ft = 'trouble',
+        size = { height = 0.35 },
+        -- trouble's preview is a float over the code that starts with a trouble buffer;
+        -- docked, it became a split that cut the code window in two
+        filter = function(_, win)
+          return not is_float(win)
+        end,
+      },
       { ft = 'OverseerList', title = 'Tasks', size = { height = 0.3 } },
       {
         ft = 'help',

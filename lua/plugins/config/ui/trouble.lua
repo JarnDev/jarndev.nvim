@@ -1,7 +1,20 @@
 return {
   'folke/trouble.nvim',
   cmd = 'Trouble',
-  opts = {},
+  opts = {
+    -- the default preview ('main') covers the code window exactly, so it reads as a
+    -- scroll, not a preview; a bordered popup on the right is visibly separate
+    preview = {
+      type = 'float',
+      relative = 'editor',
+      border = 'rounded',
+      title = 'Preview',
+      title_pos = 'center',
+      position = { 0, -2 },
+      size = { width = 0.45, height = 0.45 },
+      zindex = 200,
+    },
+  },
   keys = {
     { '<leader>xx', '<cmd>Trouble diagnostics toggle<cr>', desc = 'Workspace Diagnostics' },
     { '<leader>xd', '<cmd>Trouble diagnostics toggle filter.buf=0<cr>', desc = 'Document Diagnostics' },
