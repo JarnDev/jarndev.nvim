@@ -25,8 +25,18 @@ local function git_diff(args)
   end
 end
 
+-- sidekick takes {this}/{file}/... from the last window it saw focused, tracked by a
+-- WinEnter autocmd that only exists once the plugin has loaded. Mark the window the key
+-- was pressed in, or the first send can read neo-tree and drop every {this} prompt.
+local function here()
+  if vim.bo.filetype ~= 'sidekick_terminal' then
+    vim.w.sidekick_visit = vim.uv.hrtime()
+  end
+end
+
 local function send(msg)
   return function()
+    here()
     cli().send { name = 'pi', msg = msg }
   end
 end
@@ -49,6 +59,7 @@ return {
     {
       '<leader>ala',
       function()
+        here()
         cli().prompt { name = 'pi' }
       end,
       mode = { 'n', 'x' },
