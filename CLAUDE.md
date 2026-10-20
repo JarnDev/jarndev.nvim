@@ -88,7 +88,7 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 
 | Category | Key Plugins |
 |----------|-------------|
-| AI | claudecode.nvim (`<leader>ac*`), sidekick (Pi) + codecompanion + minuet (`<leader>al*`), copilot.vim (`<M-l>`) |
+| AI | claudecode.nvim (`<leader>ac*`), sidekick (Pi) + codecompanion + minuet (`<leader>al*`), copilot.vim (ghost-text keys `<A-y>`/`<A-Y>`/`<A-[>`/`<A-]>`/`<C-]>`, shared with minuet) |
 | Completion | blink.cmp (LSP + snippets + copilot + dadbod) |
 | Database | vim-dadbod, dadbod-ui (`<leader>D*`), dadbod-completion |
 | Editor | which-key, nvim-autopairs, nvim-dap+ui (python/C/C++/JS), nvim-lint, hover.nvim, oil.nvim (`-`), grug-far (`<leader>S`), hurl (`<leader>rr`) |

@@ -1,7 +1,7 @@
 -- Local AI code completion via Ollama (qwen2.5-coder) using minuet-ai.nvim.
 -- Non-destructive to github/copilot.vim: minuet is exposed as a blink.cmp source
 -- (see completion/blink.lua) and as an on-demand ghost-text engine via
--- `:Minuet virtualtext` + the <A-*> keymaps below.
+-- `:Minuet virtualtext`, driven by the shared ghost-text keys in completion/copilot.lua.
 -- Model choice, load/unload and "use what is already in VRAM" live in core/ollama.lua.
 local ollama = require 'core.ollama'
 
@@ -61,16 +61,10 @@ return {
     },
     -- Ghost-text UI is opt-in (auto_trigger_ft empty) so it never fights
     -- copilot.vim's automatic ghost text. Toggle per-buffer with
-    -- `:Minuet virtualtext` (or the auto-trigger command), then use these keys.
+    -- `:Minuet virtualtext` (or the auto-trigger command). No keymap here: the
+    -- ghost-text keys are shared with Copilot and live in completion/copilot.lua.
     virtualtext = {
       auto_trigger_ft = {},
-      keymap = {
-        accept = '<A-y>',
-        accept_line = '<A-Y>',
-        prev = '<A-[>',
-        next = '<A-]>',
-        dismiss = '<A-e>',
-      },
     },
   },
 }

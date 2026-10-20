@@ -196,7 +196,7 @@ plugin, with `<C-f>` to fuzzy-jump inside it.
 | `<leader>ali` · `<leader>alp` | Local inline edit · action palette (codecompanion) |
 | `<leader>alt` | Toggle ghost text: Copilot ↔ local Ollama |
 | `<leader>alm` · `<leader>alw` · `<leader>alu` | Local model: pick · warm · unload |
-| `<M-l>` (insert) | Accept Copilot suggestion |
+| `<A-y>` · `<A-Y>` (insert) | Accept the ghost-text suggestion · one line (Copilot or local) |
 
 ### Editing and UI
 

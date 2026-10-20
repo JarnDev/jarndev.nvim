@@ -329,14 +329,12 @@ copilot.vim's ghost text.
 | `<leader>alw` | n | Warm the model: reuse a loaded FIM model, else load it |
 | `<leader>alu` | n | Unload every model from VRAM now |
 | `<leader>alm` | n | Pick the model: chat, and autocomplete too when it can do FIM (★ in use · ● loaded · does not fit VRAM) |
-| `<A-y>` | i | Accept the suggestion *(local engine on)* |
-| `<A-Y>` | i | Accept one line |
-| `<A-[>` / `<A-]>` | i | Previous / next suggestion |
-| `<A-e>` | i | Dismiss |
 
 `<leader>alt` flips `vim.g.ai_engine_local`, which also decides whether blink.cmp
 queries the `minuet` source — so when it is off, nothing hits localhost on every
 keystroke. Budget: 1 completion per request, 64 tokens, 5s timeout.
+The ghost-text keys are the same as Copilot's (`<A-y>`, `<A-Y>`, `<A-[>`/`<A-]>`,
+`<C-]>`), see copilot.vim below.
 
 Model handling lives in `lua/core/ollama.lua`. Only models with Ollama's `insert`
 capability can do fill-in-the-middle (here just `qwen2.5-coder:14b`); the others
@@ -417,11 +415,16 @@ Inline ghost text from GitHub Copilot, and a blink source (scored above LSP at
 
 | Key | Mode | Action |
 | --- | --- | --- |
-| `<M-l>` | i | Accept the ghost-text suggestion |
+| `<A-y>` | i | Accept the ghost-text suggestion |
+| `<A-Y>` | i | Accept one line |
+| `<A-[>` / `<A-]>` | i | Previous / next suggestion (with none shown, ask for one) |
+| `<C-]>` | i | Dismiss |
 
-`<Tab>` belongs to blink, so `copilot_no_tab_map` is set and `<M-l>` is the
-accept key. Run `:Copilot setup` once. Toggle it off in favour of the local
-model with `<leader>alt`.
+These keys are shared with the local engine (minuet): each one acts on whichever
+suggestion is on screen, so they are the same after `<leader>alt`. `<Tab>`
+belongs to blink, so `copilot_no_tab_map` is set and `<A-y>` is the accept key,
+like blink's `<C-y>`. Run `:Copilot setup` once. Toggle it off in favour of the
+local model with `<leader>alt`.
 
 ## Database
 
