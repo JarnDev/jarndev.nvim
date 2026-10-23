@@ -81,6 +81,7 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 - **Symbol outline is `<leader>xs`** (`Trouble symbols`) — aerial.nvim / outline.nvim are deliberately not installed. Trouble also provides `lsp_incoming_calls`, `lsp_outgoing_calls` and a `profiler` mode.
 - **File renames reach the LSP**: oil (`OilActionsPost`) and neo-tree (`file_moved`/`file_renamed`) call `Snacks.rename.on_rename_file`, so tsserver & co. rewrite imports. oil passes `oil://` URLs -- strip the scheme first.
 - **`]]`/`[[` are snacks.words** LSP-reference navigation, bound in `keymaps/init.lua` (snacks enables the module but binds no keys itself).
+- **devdocs pages go through our own converter** (`editor/devdocs.lua` replaces `devdocs.docs.ConvertHtmlToMarkdown`): `<pre>` is wrapped in `<code>` (pandoc 3.11 reads a bare `<pre>` as plain text) and `pandoc/devdocs.lua` rewrites tables GFM can't hold, which pandoc would otherwise leave as raw `<table>` HTML. A filter change needs a re-extract: `:lua require('devdocs.docs').ExtractDocs('cpp')`.
 - **HTTP is hurl.nvim + the `hurl` binary** (`.hurl` files, `<leader>r*`). kulala was dropped: its engine became the closed `kulala-core` binary behind a license token (core.kulala.app) and the release repo the fork used is gone.
 
 ### Active Plugin Summary
@@ -124,6 +125,7 @@ System binaries that must be installed separately:
 | `hurl` | HTTP requests (`<leader>r*`) | `brew install hurl` / release tarball from github.com/Orange-OpenSource/hurl |
 | `pi` | Local agent in the right pane (`<leader>alc`); config in `~/.pi/agent` | `npm install -g --ignore-scripts @earendil-works/pi-coding-agent` |
 | `ollama` | Local model for Pi, codecompanion and minuet (`<leader>al*`); can live on another machine via `OLLAMA_API_BASE` | https://ollama.com |
+| `pandoc` (3.x) | devdocs.nvim HTML -> Markdown (`<leader>i*`), filtered by `pandoc/devdocs.lua` | https://github.com/jgm/pandoc/releases |
 | `gh` | octo.nvim issues/PR review — needs `gh auth login` | `sudo apt install gh` |
 | `perf` / `valgrind` | Profiling C/C++ (`perf record`, `--tool=callgrind`) | `sudo apt install linux-tools-generic valgrind` |
 

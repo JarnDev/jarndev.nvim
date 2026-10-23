@@ -709,6 +709,8 @@ one, `<Esc>` clears them all. Then edit as usual -- every cursor follows.
 
 Offline documentation from devdocs.io, read inside Neovim. C and C++
 (cppreference, ~100 MB) download the first time a `<leader>i` key is used.
+Pages are converted to Markdown by pandoc through `pandoc/devdocs.lua`:
+declarations show as a `cpp` block, member lists as bullet lists, no raw HTML.
 
 | Key | Action |
 | --- | --- |
