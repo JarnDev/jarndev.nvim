@@ -1234,6 +1234,8 @@ Textobjects backed by the treesitter queries. Note `f` is the function
 | `au` / `iu` | A function **call** / its arguments |
 
 Use with any operator: `vaf`, `dif`, `cia`, `yic`. Searches within 500 lines.
+which-key lists these (and the next/last variants `in`, `an`, `il`, `al`) after
+an operator plus `i`/`a`, e.g. `gsai`, `vi`, `da`.
 
 #### mini.surround
 
@@ -1248,6 +1250,10 @@ Prefixed `gs` so bare `s` stays free for flash.
 | `gsh` | Highlight the surround |
 | `gsn` | Change how many lines it searches |
 
+Pause after the motion (e.g. `gsaiw`) and a popup lists the surrounding ids:
+`( [ { <` pad with a space, `) ] } >` tight, `b` brackets, `q` quotes, `f` a
+function call (asks the name), `t` a tag, `?` asks both sides, any other char
+wraps with itself.
 #### mini.move
 
 Select (`v`/`V`), then `<A-h/j/k/l>` moves the selection, reindenting linewise
