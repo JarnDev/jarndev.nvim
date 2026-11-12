@@ -721,6 +721,7 @@ declarations show as a `cpp` block, member lists as bullet lists, no raw HTML.
 | `<leader>ii` | Install another doc set (`python~3.12`, `javascript`, `typescript`, `node`...) |
 | `<leader>iv` | Browse the files of a doc set |
 | `<leader>id` | Delete a doc set |
+| `<leader>ik` | C/C++: cppreference page for the symbol under the cursor (explanation + example) in a hover |
 
 ### overseer.nvim
 
@@ -800,11 +801,21 @@ bufferline counters all pick them up.
 | Key | Action |
 | --- | --- |
 | `K` | LSP hover *(buffer, set on LspAttach)* |
-| `gK` | Choose a hover provider (LSP, dictionary) |
+| `gK` | Choose a hover provider (LSP, dictionary, cppreference in C/C++) |
+| `<leader>ik` | C/C++: cppreference page in the hover *(see devdocs)* |
 | mouse hover | Hover after 1 s (`mousemoveevent` is on) |
 
 `K` is pinned to `vim.lsp.buf.hover` in any LSP buffer so hover.nvim's provider
 cycling never shadows it.
+
+clangd's hover only has the comments in the headers -- for the standard library,
+mostly the signature. `<leader>ik` (`lua/core/cppref.lua`) shows the offline
+cppreference page instead: description, parameters, notes and `### Example`. The
+page is found from the word under the cursor plus the scope clangd reports
+(`// In namespace std`, `// In vector<int>`); when several pages match it asks.
+Press `<leader>ik` again to enter the popup and scroll to the example. On a machine
+without the docs yet, the first `<leader>ik` starts the download (~100 MB, pandoc)
+and says to try again once devdocs reports it done (~1.5 min).
 
 ### auto-session
 

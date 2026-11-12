@@ -32,6 +32,7 @@ require('plugins')    -- lazy.setup() with all plugin imports
 lua/
   bootstrap/          Leader key, Nerd Font flag, lazy.nvim install
   core/               options.lua, autocommands.lua (+ pt_br/en spell in prose), asm.lua (:Asm),
+                      cppref.lua (hover provider: cppreference page for the C/C++ symbol),
                       ollama.lua (local model pick/load/unload, chat + FIM),
                       checks.lua (overseer "Check:" tasks: tsc/eslint/pyright/ruff/cmake-make)
   overseer/component/ trouble_qflist.lua (custom overseer component, found on the rtp)
@@ -67,7 +68,7 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 - **Terminal/Lazygit**: snacks.nvim terminal/lazygit (`<leader>lg/ld/lt`), not toggleterm or kdheepak/lazygit.
 - **Statusline**: lualine.nvim (mini.statusline is disabled in mini.lua).
 - **AI**: claudecode.nvim (Claude Code CLI in a terminal, `<leader>ac`) + local Ollama under `<leader>al`: sidekick.nvim hosting the Pi agent (chat, right pane; Pi config in `~/.pi/agent`), codecompanion (inline) and minuet (FIM), model handling in `core/ollama.lua`. copilot.vim stays for ghost-text completions. codecompanion is Ollama-only: its Anthropic adapter needs a paid API key the Claude subscription does not cover.
-- **Hover**: hover.nvim (`K` = hover, `gK` = select provider). Configured in `lua/plugins/config/editor/hover.lua`.
+- **Hover**: hover.nvim (`K` = hover, `gK` = select provider). Configured in `lua/plugins/config/editor/hover.lua`. `<leader>ik` in C/C++ is a custom provider (`core/cppref.lua`) that shows the offline cppreference page (with example) for the symbol: pages are indexed by their `# title` line, scope taken from clangd's hover; alias copies (`io/c/printf` = `io/c/fprintf`) are deduped by content. It only trusts a set devdocs' `state.json` marks `extracted` (the folder fills during extraction); otherwise it loads devdocs, whose `ensure_installed` downloads it.
 - **Terminal**: kitty from the upstream installer (`os-custom-config/linux/install-kitty.sh`); the Ubuntu apt kitty 0.32.2 doubles Backspace/Enter under KKP (fixed in 0.33). No Neovim-side workaround is needed.
 - **LSP servers**: configured with `vim.lsp.config()` in `lspconfig.lua`; mason-lspconfig v2 auto-enables installed servers (`automatic_enable.exclude` keeps stylua/ruff/eslint_d as tools only).
 - **The two Mason installers take different name spaces** and must not be mixed: `mason-tool-installer` takes mason *package* names (`lua-language-server`), `mason-lspconfig` takes *lspconfig* server names (`lua_ls`) and maps them itself. Server names go in the `servers` table (-> mason-lspconfig); standalone tools go in the `mason-tool-installer` list. Passing an lspconfig name to mason-tool-installer makes it silently skip that package.
@@ -96,7 +97,7 @@ Create a file in the appropriate `lua/plugins/config/<category>/` directory retu
 | Refactor/Docs | refactoring.nvim (`<leader>cr`), neogen (`<leader>cd`), inc-rename (`<leader>cn`), ts-comments (fixes `gc` in JSX) |
 | Tasks | overseer.nvim (`<leader>o*`) |
 | Editing | yanky (`p`/`P`, `<leader>p`), dial (`<C-a>`/`<C-x>`), mini.ai/surround/move (`<A-hjkl>` on a selection), multicursor (`<C-Up/Down>`, `<leader>n/N`), undotree (`<leader>uu`) |
-| Docs | devdocs offline, C/C++ by default (`<leader>i*`) |
+| Docs | devdocs offline, C/C++ by default (`<leader>i*`); cppreference in a hover for the symbol (`<leader>ik`) |
 | REPL | iron.nvim: IPython / node in a split, startable from any buffer (`<leader>ep` / `<leader>ej`, sends `<leader>e*`) |
 | Notes | obsidian.nvim on `~/git/vault` (`<leader>v*`): no frontmatter, title = file name, new notes in `00-Inbox` |
 | Git worktrees | `core/worktree.lua` (`<leader>gw` switch, `<leader>gW` new) |

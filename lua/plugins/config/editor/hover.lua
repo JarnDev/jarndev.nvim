@@ -9,6 +9,7 @@ return {
       providers = {
         'hover.providers.lsp',
         'hover.providers.dictionary',
+        'core.cppref', -- C/C++: cppreference page from the offline devdocs (<leader>ik)
         -- 'hover.providers.diagnostic', 'hover.providers.dap', 'hover.providers.man',
         -- 'hover.providers.gh', 'hover.providers.gh_user', 'hover.providers.jira',
         -- 'hover.providers.fold_preview', 'hover.providers.highlight',
@@ -25,6 +26,14 @@ return {
       },
       mouse_delay = 1000,
     }
+
+    -- K stays clangd; this one shows the cppreference page (explanation + example)
+    vim.keymap.set('n', '<leader>ik', function()
+      if vim.bo.filetype ~= 'c' and vim.bo.filetype ~= 'cpp' then
+        return vim.notify('cppreference: only in C/C++ buffers', vim.log.levels.WARN)
+      end
+      require('hover').open { providers = { 'core.cppref' } }
+    end, { desc = 'Docs: cppreference for the symbol (explanation + example)' })
 
     -- K is reserved for LSP hover (set buffer-local in LspAttach below).
     -- gK opens the provider picker (dictionary, etc).
